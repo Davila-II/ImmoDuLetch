@@ -48,7 +48,8 @@ export function useSubmitProperty() {
       if (!reference) {
         // Création initiale du brouillon
         const response = await api.post('/my/properties', payload);
-        const newRef = response.data.reference;
+        const prop = response.data?.data || response.data;
+        const newRef = prop.reference;
         setReference(newRef);
         return newRef;
       } else {
@@ -82,17 +83,23 @@ export function useSubmitProperty() {
         uploadData.append('images[]', file);
       });
 
+      // Ne pas forcer Content-Type: multipart/form-data manuellement sans boundary ;
+      // laisser le navigateur générer automatiquement avec le bon boundary
       const response = await api.post(`/my/properties/${activeRef}/images`, uploadData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+        headers: {
+          'Content-Type': undefined,
+        },
       });
 
       // Synchroniser la liste des images depuis la réponse API
-      if (response.data && response.data.images) {
-        setImages(response.data.images);
+      const propData = response.data?.data || response.data;
+      if (propData && propData.images) {
+        setImages(propData.images);
       }
     } catch (err) {
       console.error('Erreur upload photos', err);
-      setError("Erreur lors de l'envoi des photos.");
+      const serverMessage = err.response?.data?.message || err.response?.data?.error || "Erreur lors de l'envoi des photos.";
+      setError(serverMessage);
     } finally {
       setIsUploading(false);
     }
