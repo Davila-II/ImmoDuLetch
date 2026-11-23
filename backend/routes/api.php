@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AgencyController;
+use App\Http\Controllers\Api\Admin\PropertyModerationController;
+use App\Http\Controllers\Api\Admin\StatsController;
+use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\FavoriteController;
@@ -7,6 +11,7 @@ use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MyPropertyController;
 use App\Http\Controllers\Api\PropertyController;
 use App\Http\Controllers\Api\PropertyImageController;
+use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
 // Toutes ces routes sont automatiquement préfixées par /api
@@ -63,4 +68,30 @@ Route::middleware('auth:sanctum')->prefix('my')->name('my.')->group(function () 
     // Demandes reçues sur mes biens
     Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
     Route::patch('inquiries/{inquiry}', [InquiryController::class, 'update'])->name('inquiries.update');
+});
+
+// --- Administration (jeton requis ET compte administrateur) ---
+Route::middleware(['auth:sanctum', EnsureUserIsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('stats', StatsController::class)->name('stats');
+
+    // Modération des annonces
+    Route::get('properties', [PropertyModerationController::class, 'index'])->name('properties.index');
+    Route::get('properties/{property:reference}', [PropertyModerationController::class, 'show'])->name('properties.show');
+    Route::post('properties/{property:reference}/approve', [PropertyModerationController::class, 'approve'])->name('properties.approve');
+    Route::post('properties/{property:reference}/reject', [PropertyModerationController::class, 'reject'])->name('properties.reject');
+    Route::post('properties/{property:reference}/suspend', [PropertyModerationController::class, 'suspend'])->name('properties.suspend');
+    Route::post('properties/{property:reference}/reinstate', [PropertyModerationController::class, 'reinstate'])->name('properties.reinstate');
+    Route::patch('properties/{property:reference}/flags', [PropertyModerationController::class, 'flags'])->name('properties.flags');
+
+    // Utilisateurs (lecture seule)
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+
+    // Agences
+    Route::get('agencies', [AgencyController::class, 'index'])->name('agencies.index');
+    Route::post('agencies', [AgencyController::class, 'store'])->name('agencies.store');
+    Route::get('agencies/{agency}', [AgencyController::class, 'show'])->name('agencies.show');
+    Route::patch('agencies/{agency}', [AgencyController::class, 'update'])->name('agencies.update');
+    Route::post('agencies/{agency}/members', [AgencyController::class, 'addMember'])->name('agencies.members.add');
+    Route::delete('agencies/{agency}/members/{user}', [AgencyController::class, 'removeMember'])->name('agencies.members.remove');
 });
