@@ -1,14 +1,21 @@
 import React from 'react';
-import { Home, Building2, MapPin, Building, Store } from 'lucide-react';
+import { Home, Building, MapPin, Building2, Store, Package } from 'lucide-react';
+import { useCatalog } from '../../hooks/useCatalog';
 
-const CATEGORIES = [
-  { id: 1, name: 'Villa / Duplex', desc: 'Haut standing, Résidence', icon: Home },
-  { id: 2, name: 'Appartement / Studio', desc: 'Meublé ou non meublé', icon: Building },
-  { id: 3, name: 'Terrain Titré / Parcelle', desc: 'Titre Foncier net vendeur', icon: MapPin },
-  { id: 4, name: 'Immeuble / Bureau', desc: 'Rapport locatif, Bureaux', icon: Building2 },
-];
+// Icône et sous-titre de chaque catégorie, d'après son identifiant (slug) côté serveur
+const CATEGORY_UI = {
+  'villa-duplex': { icon: Home, desc: 'Haut standing, résidence' },
+  'appartement-studio': { icon: Building, desc: 'Meublé ou non meublé' },
+  'terrain-titre': { icon: MapPin, desc: 'Terrain ou parcelle' },
+  'immeuble-bureau': { icon: Building2, desc: 'Rapport locatif, bureaux' },
+  'commerce-local': { icon: Store, desc: 'Boutiques et locaux commerciaux' },
+};
+const FALLBACK_UI = { icon: Package, desc: '' };
 
-export default function Step1Operation({ formData, onChange, onNext, isSaving }) {
+export default function Step1Operation({ formData, onChange, onNext, isSaving, missing = [] }) {
+  const { categories, isLoading, error } = useCatalog();
+  const canContinue = missing.length === 0 && !isSaving;
+
   return (
     <div className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs space-y-8">
       <div>
@@ -25,6 +32,7 @@ export default function Step1Operation({ formData, onChange, onNext, isSaving })
         <input
           type="text"
           required
+          maxLength={255}
           placeholder="Ex : Duplex d'Exception avec Forage &amp; Piscine à Bastos"
           value={formData.title}
           onChange={(e) => onChange('title', e.target.value)}
@@ -32,48 +40,46 @@ export default function Step1Operation({ formData, onChange, onNext, isSaving })
         />
       </div>
 
-      {/* Type d'opération (À Vendre / À Louer) */}
+      {/* Type d'opération */}
       <div>
         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
           Type d'opération transactionnelle <span className="text-rose-500">*</span>
         </label>
         <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => onChange('transaction_type', 'sale')}
-            className={`p-4 rounded-xl border text-center font-bold text-sm transition flex flex-col items-center justify-center gap-1 ${
-              formData.transaction_type === 'sale'
-                ? 'bg-[#0A1931] text-white border-[#0A1931] shadow-md'
-                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            <span>À Vendre</span>
-            <span className="text-[11px] font-normal opacity-80">(Cession de propriété certifiée)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onChange('transaction_type', 'rent')}
-            className={`p-4 rounded-xl border text-center font-bold text-sm transition flex flex-col items-center justify-center gap-1 ${
-              formData.transaction_type === 'rent'
-                ? 'bg-[#0A1931] text-white border-[#0A1931] shadow-md'
-                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            <span>À Louer</span>
-            <span className="text-[11px] font-normal opacity-80">(Bail résidentiel ou commercial)</span>
-          </button>
+          {[
+            { id: 'sale', label: 'À Vendre', hint: '(Cession de propriété)' },
+            { id: 'rent', label: 'À Louer', hint: '(Bail résidentiel ou commercial)' },
+          ].map((option) => (
+            <button
+              type="button"
+              key={option.id}
+              onClick={() => onChange('transaction_type', option.id)}
+              className={`p-4 rounded-xl border text-center font-bold text-sm transition flex flex-col items-center justify-center gap-1 ${
+                formData.transaction_type === option.id
+                  ? 'bg-[#0A1931] text-white border-[#0A1931] shadow-md'
+                  : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <span>{option.label}</span>
+              <span className="text-[11px] font-normal opacity-80">{option.hint}</span>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Catégories avec Cards (comme screen (5).png) */}
+      {/* Catégories, chargées depuis l'API */}
       <div>
         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
           Catégorie d'actif immobilier <span className="text-rose-500">*</span>
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
+
+        {isLoading && <p className="text-xs text-slate-400">Chargement des catégories…</p>}
+        {error && <p className="text-xs text-rose-600">{error}</p>}
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {categories.map((cat) => {
+            const ui = CATEGORY_UI[cat.slug] || FALLBACK_UI;
+            const Icon = ui.icon;
             const isSelected = formData.category_id === cat.id;
 
             return (
@@ -87,15 +93,17 @@ export default function Step1Operation({ formData, onChange, onNext, isSaving })
                     : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                {isSelected && (
-                  <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500" />
-                )}
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isSelected ? 'bg-[#0A1931] text-amber-400' : 'bg-slate-100 text-slate-600'}`}>
+                {isSelected && <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500" />}
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                    isSelected ? 'bg-[#0A1931] text-amber-400' : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
                   <Icon className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-slate-900">{cat.name}</div>
-                  <div className="text-[10px] text-slate-500">{cat.desc}</div>
+                  <div className="text-[10px] text-slate-500">{ui.desc}</div>
                 </div>
               </button>
             );
@@ -103,7 +111,7 @@ export default function Step1Operation({ formData, onChange, onNext, isSaving })
         </div>
       </div>
 
-      {/* Localisation & Adresse */}
+      {/* Localisation */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
         <div>
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
@@ -114,18 +122,20 @@ export default function Step1Operation({ formData, onChange, onNext, isSaving })
             onChange={(e) => onChange('city', e.target.value)}
             className="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg font-medium"
           >
+            <option value="">Sélectionner une ville</option>
             <option value="Douala">Douala (Littoral)</option>
             <option value="Yaoundé">Yaoundé (Centre)</option>
-            <option value="Kribi">Kribi (Océan)</option>
+            <option value="Kribi">Kribi (Sud)</option>
           </select>
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Quartier de situation
+            Quartier de situation <span className="text-rose-500">*</span>
           </label>
           <input
             type="text"
+            maxLength={100}
             placeholder="Ex : Bastos (Ambassades) ou Bonapriso"
             value={formData.neighborhood}
             onChange={(e) => onChange('neighborhood', e.target.value)}
@@ -135,24 +145,31 @@ export default function Step1Operation({ formData, onChange, onNext, isSaving })
 
         <div className="sm:col-span-2">
           <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-            Adresse physique / Repère cadastral
+            Adresse physique / repère
           </label>
           <input
             type="text"
-            placeholder="Ex : Rue Joseph Mballa, Face Résidence Ambassade"
+            maxLength={255}
+            placeholder="Ex : Rue Joseph Mballa, face Résidence Ambassade"
             value={formData.address}
             onChange={(e) => onChange('address', e.target.value)}
             className="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg"
           />
+          <p className="text-[11px] text-slate-400 mt-1">
+            L'adresse exacte n'est visible que par vous et par l'équipe de modération.
+          </p>
         </div>
       </div>
 
-      <div className="flex justify-end pt-4 border-t border-slate-100">
+      <div className="flex items-center justify-between gap-4 pt-4 border-t border-slate-100">
+        <p className="text-[11px] text-slate-400">
+          {missing.length > 0 ? `À renseigner : ${missing.map((item) => item.label).join(', ')}` : ''}
+        </p>
         <button
           type="button"
           onClick={onNext}
-          disabled={!formData.title || isSaving}
-          className="bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 px-6 rounded-xl text-xs flex items-center gap-2 transition shadow-sm disabled:opacity-50"
+          disabled={!canContinue}
+          className="bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 px-6 rounded-xl text-xs flex items-center gap-2 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
           <span>{isSaving ? 'Enregistrement...' : 'Continuer vers Caractéristiques'}</span>
           <span>→</span>

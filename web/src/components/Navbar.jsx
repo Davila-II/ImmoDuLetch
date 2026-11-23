@@ -66,7 +66,7 @@ export default function Navbar() {
             </Link>
 
             <Link
-              to="/submit"
+              to="/deposer"
               className="flex items-center gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 px-4 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition"
             >
               <PlusCircle className="w-4 h-4" />

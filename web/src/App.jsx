@@ -29,6 +29,7 @@ export default function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/my-account" element={<AccountDashboardPage />} />
               <Route path="/submit" element={<SubmitPropertyPage />} />
+              <Route path="/submit/:reference" element={<SubmitPropertyPage />} />
             </Routes>
           </main>
           <Footer />

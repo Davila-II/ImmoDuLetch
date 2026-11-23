@@ -43,7 +43,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li><a href="#estimation" className="hover:text-amber-400 transition">Estimation gratuite en ligne</a></li>
               <li><a href="#investissement" className="hover:text-amber-400 transition">Calculateur de rentabilité locative</a></li>
-              <li><Link to="/submit" className="hover:text-amber-400 transition">Déposer une annonce propriétaire</Link></li>
+              <li><Link to="/deposer" className="hover:text-amber-400 transition">Déposer une annonce propriétaire</Link></li>
               <li><a href="#" className="hover:text-amber-400 transition">Audit foncier &amp; Géomètre assermenté</a></li>
               <li><a href="#" className="hover:text-amber-400 transition">Accompagnement Notarié OHADA</a></li>
             </ul>

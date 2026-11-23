@@ -79,7 +79,7 @@ export default function AccountDashboardPage() {
 
         <div className="flex items-center gap-3">
           <Link
-            to="/submit"
+            to="/deposer"
             className="bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold px-4 py-2 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm"
           >
             <Plus className="w-4 h-4" />
@@ -164,13 +164,24 @@ export default function AccountDashboardPage() {
                       <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> {prop.views_count || 0} vues</span>
                       <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> {prop.contacts_count || 0} contacts</span>
                     </div>
-                    <Link
-                      to={`/properties/${prop.reference}`}
-                      className="text-amber-600 font-semibold hover:underline flex items-center gap-1"
-                    >
-                      <span>Voir</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      {prop.status === 'draft' && (
+                        <Link
+                          to={`/deposer/${prop.reference}`}
+                          className="text-[#0A1931] font-semibold hover:underline flex items-center gap-1"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>Reprendre</span>
+                        </Link>
+                      )}
+                      <Link
+                        to={`/properties/${prop.reference}`}
+                        className="text-amber-600 font-semibold hover:underline flex items-center gap-1"
+                      >
+                        <span>Voir</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -180,7 +191,7 @@ export default function AccountDashboardPage() {
               <Building className="w-10 h-10 text-slate-300 mx-auto" />
               <p className="text-slate-600 text-sm font-semibold">Vous n'avez pas encore publié d'annonce.</p>
               <Link
-                to="/submit"
+                to="/deposer"
                 className="inline-block bg-[#F5A623] text-slate-950 font-bold px-4 py-2 rounded-lg text-xs"
               >
                 Déposer mon premier bien
