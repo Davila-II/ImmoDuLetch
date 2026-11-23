@@ -16,7 +16,7 @@ export default function Navbar() {
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-1.5 font-medium text-amber-400">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Plateforme Immobilière Certifiée Cameroun
+              Plateforme Immobilière Certifiée
             </span>
             <span>• Titres Fonciers vérifiés &amp; Bornages certifiés</span>
             <span>• Sécurisation Notariale</span>
@@ -24,8 +24,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4 text-slate-400">
             <span>Douala • Yaoundé • Kribi</span>
             <span className="text-slate-600">|</span>
-            <span className="text-amber-300 font-semibold">Devise : FCFA (XAF)</span>
-          </div>
+            </div>
         </div>
       </div>
 
