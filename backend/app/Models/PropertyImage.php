@@ -26,10 +26,10 @@ class PropertyImage extends Model
         ];
     }
 
-    // URL publique de la photo (nécessite php artisan storage:link)
+    // URL publique de la photo (disque « public », nécessite php artisan storage:link)
     protected function url(): Attribute
     {
-        return Attribute::get(fn () => Storage::url($this->path));
+        return Attribute::get(fn () => Storage::disk('public')->url($this->path));
     }
 
     public function property(): BelongsTo

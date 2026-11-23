@@ -14,6 +14,9 @@ use Illuminate\Validation\ValidationException;
 
 class MyPropertyController extends Controller
 {
+    // Nombre minimum de photos pour envoyer une annonce en validation
+    private const MIN_PHOTOS_TO_SUBMIT = 3;
+
     // GET /api/my/properties : « Mes annonces » avec les compteurs du tableau de bord
     public function index(Request $request)
     {
@@ -145,6 +148,12 @@ class MyPropertyController extends Controller
         if (! $property->built_area && ! $property->land_area) {
             throw ValidationException::withMessages([
                 'built_area' => ['Indiquez la surface bâtie ou la superficie du terrain.'],
+            ]);
+        }
+
+        if ($property->images()->count() < self::MIN_PHOTOS_TO_SUBMIT) {
+            throw ValidationException::withMessages([
+                'images' => ['Ajoutez au moins ' . self::MIN_PHOTOS_TO_SUBMIT . ' photos avant d\'envoyer l\'annonce.'],
             ]);
         }
 

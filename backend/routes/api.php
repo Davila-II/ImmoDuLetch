@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\MyPropertyController;
 use App\Http\Controllers\Api\PropertyController;
+use App\Http\Controllers\Api\PropertyImageController;
 use Illuminate\Support\Facades\Route;
 
 // Toutes ces routes sont automatiquement préfixées par /api
@@ -37,4 +38,11 @@ Route::middleware('auth:sanctum')->prefix('my')->name('my.')->group(function () 
     Route::match(['put', 'patch'], 'properties/{property:reference}', [MyPropertyController::class, 'update'])->name('properties.update');
     Route::delete('properties/{property:reference}', [MyPropertyController::class, 'destroy'])->name('properties.destroy');
     Route::post('properties/{property:reference}/submit', [MyPropertyController::class, 'submit'])->name('properties.submit');
+
+    // Photos d'un bien
+    // scopeBindings() : Laravel vérifie que l'{image} appartient bien à ce bien
+    Route::post('properties/{property:reference}/images', [PropertyImageController::class, 'store'])->name('properties.images.store');
+    Route::put('properties/{property:reference}/images/order', [PropertyImageController::class, 'reorder'])->name('properties.images.reorder');
+    Route::patch('properties/{property:reference}/images/{image}', [PropertyImageController::class, 'update'])->name('properties.images.update')->scopeBindings();
+    Route::delete('properties/{property:reference}/images/{image}', [PropertyImageController::class, 'destroy'])->name('properties.images.destroy')->scopeBindings();
 });
