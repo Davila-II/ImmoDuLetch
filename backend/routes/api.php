@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CatalogController;
+use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\InquiryController;
 use App\Http\Controllers\Api\MyPropertyController;
 use App\Http\Controllers\Api\PropertyController;
 use App\Http\Controllers\Api\PropertyImageController;
@@ -30,6 +32,18 @@ Route::get('properties', [PropertyController::class, 'index']);
 Route::get('properties/{property:reference}', [PropertyController::class, 'show'])->name('properties.show');
 Route::get('properties/{property:reference}/similar', [PropertyController::class, 'similar']);
 
+// Demande de contact ou de visite : ouverte aux visiteurs non connectés.
+// throttle:10,1 = 10 envois par minute et par adresse IP, contre le spam
+Route::post('properties/{property:reference}/inquiries', [InquiryController::class, 'store'])
+    ->middleware('throttle:10,1');
+
+// --- Favoris (jeton requis) ---
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('favorites', [FavoriteController::class, 'index']);
+    Route::put('properties/{property:reference}/favorite', [FavoriteController::class, 'store']);
+    Route::delete('properties/{property:reference}/favorite', [FavoriteController::class, 'destroy']);
+});
+
 // --- Espace connecté : mes annonces ---
 Route::middleware('auth:sanctum')->prefix('my')->name('my.')->group(function () {
     Route::get('properties', [MyPropertyController::class, 'index'])->name('properties.index');
@@ -45,4 +59,8 @@ Route::middleware('auth:sanctum')->prefix('my')->name('my.')->group(function () 
     Route::put('properties/{property:reference}/images/order', [PropertyImageController::class, 'reorder'])->name('properties.images.reorder');
     Route::patch('properties/{property:reference}/images/{image}', [PropertyImageController::class, 'update'])->name('properties.images.update')->scopeBindings();
     Route::delete('properties/{property:reference}/images/{image}', [PropertyImageController::class, 'destroy'])->name('properties.images.destroy')->scopeBindings();
+
+    // Demandes reçues sur mes biens
+    Route::get('inquiries', [InquiryController::class, 'index'])->name('inquiries.index');
+    Route::patch('inquiries/{inquiry}', [InquiryController::class, 'update'])->name('inquiries.update');
 });

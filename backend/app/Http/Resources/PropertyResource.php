@@ -9,8 +9,11 @@ class PropertyResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // Vrai pour les routes de l'espace connecté (noms commençant par « my. »)
-        $isMine = $request->routeIs('my.*');
+        // Utilisateur connecté, s'il envoie un jeton (même sur une route publique)
+        $viewer = $request->user('sanctum');
+
+        // Les champs privés ne sortent que pour le propriétaire du bien ou un administrateur
+        $isMine = $viewer && ($viewer->id === $this->user_id || $viewer->isAdmin());
 
         return [
             'id' => $this->id,
@@ -35,6 +38,9 @@ class PropertyResource extends JsonResource
             'virtual_tour_url' => $this->virtual_tour_url,
             'views_count' => $this->views_count,
             'published_at' => $this->published_at,
+
+            // Présent seulement si l'utilisateur est connecté (le cœur des cartes)
+            'is_favorite' => $this->when($viewer !== null, fn () => in_array($this->id, $this->favoriteIds($request, $viewer))),
 
             // Ces champs n'apparaissent que si la relation (ou le comptage) a été chargé
             'photos_count' => $this->whenCounted('images'),
@@ -63,7 +69,7 @@ class PropertyResource extends JsonResource
                 'is_certified_agency' => (bool) $this->agency?->is_certified,
             ]),
 
-            // Réservé au propriétaire (routes /api/my/...)
+            // Réservé au propriétaire du bien et aux administrateurs
             'status' => $this->when($isMine, $this->status),
             'draft_step' => $this->when($isMine, $this->draft_step),
             'address' => $this->when($isMine, $this->address),
@@ -73,5 +79,19 @@ class PropertyResource extends JsonResource
             'rejection_reason' => $this->when($isMine, $this->rejection_reason),
             'created_at' => $this->when($isMine, $this->created_at),
         ];
+    }
+
+    // Identifiants des favoris de l'utilisateur, chargés une seule fois par requête
+    // (et non une fois par bien de la liste)
+    private function favoriteIds(Request $request, $viewer): array
+    {
+        $ids = $request->attributes->get('favorite_ids');
+
+        if ($ids === null) {
+            $ids = $viewer->favorites()->pluck('properties.id')->all();
+            $request->attributes->set('favorite_ids', $ids);
+        }
+
+        return $ids;
     }
 }
