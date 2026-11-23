@@ -10,7 +10,7 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
-  // Filtres d'état local
+  // Filtres d'état local initialisés directement depuis les searchParams
   const [filters, setFilters] = useState({
     transaction_type: searchParams.get('transaction_type') || '',
     category: searchParams.get('category') || '',
@@ -20,19 +20,20 @@ export default function PropertiesPage() {
     max_price: searchParams.get('max_price') || '',
     min_bedrooms: searchParams.get('min_bedrooms') || '',
     land_status: searchParams.get('land_status') || '',
-    sort: searchParams.get('sort') || 'latest',
+    sort: searchParams.get('sort') || 'newest',
   });
 
-  const fetchProperties = async () => {
+  // Fonction de chargement qui accepte les filtres en argument pour éviter les closures désynchronisées
+  const fetchProperties = async (activeFilters = filters) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, val]) => {
+      Object.entries(activeFilters).forEach(([key, val]) => {
         if (val) params.append(key, val);
       });
       const response = await api.get(`/properties?${params.toString()}`);
-      setProperties(response.data.data || []);
-      setTotal(response.data.total || (response.data.data ? response.data.data.length : 0));
+      setProperties(response.data?.data || []);
+      setTotal(response.data?.total ?? (response.data?.data ? response.data.data.length : 0));
     } catch (err) {
       console.error('Erreur listing biens', err);
     } finally {
@@ -40,17 +41,43 @@ export default function PropertiesPage() {
     }
   };
 
+  // Synchronisation stricte quand l'URL change (ex: clic sur une catégorie ou retour arrière)
   useEffect(() => {
-    fetchProperties();
-  }, [filters.sort]);
+    const updated = {
+      transaction_type: searchParams.get('transaction_type') || '',
+      category: searchParams.get('category') || '',
+      city: searchParams.get('city') || '',
+      q: searchParams.get('q') || '',
+      min_price: searchParams.get('min_price') || '',
+      max_price: searchParams.get('max_price') || '',
+      min_bedrooms: searchParams.get('min_bedrooms') || '',
+      land_status: searchParams.get('land_status') || '',
+      sort: searchParams.get('sort') || 'newest',
+    };
+    setFilters(updated);
+    fetchProperties(updated);
+  }, [searchParams]);
 
   const handleApplyFilters = (e) => {
     e.preventDefault();
-    fetchProperties();
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, val]) => {
+      if (val) params.append(key, val);
+    });
+    setSearchParams(params);
+  };
+
+  const handleSortChange = (newSort) => {
+    const updated = { ...filters, sort: newSort };
+    setFilters(updated);
+    const params = new URLSearchParams(searchParams);
+    if (newSort) params.set('sort', newSort);
+    else params.delete('sort');
+    setSearchParams(params);
   };
 
   const resetFilters = () => {
-    setFilters({
+    const cleared = {
       transaction_type: '',
       category: '',
       city: '',
@@ -59,8 +86,11 @@ export default function PropertiesPage() {
       max_price: '',
       min_bedrooms: '',
       land_status: '',
-      sort: 'latest',
-    });
+      sort: 'newest',
+    };
+    setFilters(cleared);
+    setSearchParams({});
+    fetchProperties(cleared);
   };
 
   return (
@@ -80,10 +110,10 @@ export default function PropertiesPage() {
           <label className="text-xs font-semibold text-slate-600 whitespace-nowrap">Trier par :</label>
           <select
             value={filters.sort}
-            onChange={(e) => setFilters({ ...filters, sort: e.target.value })}
+            onChange={(e) => handleSortChange(e.target.value)}
             className="text-xs bg-white border border-slate-200 rounded-lg px-3 py-2 font-medium focus:ring-2 focus:ring-[#0A1931]"
           >
-            <option value="latest">Nouveautés d'abord</option>
+            <option value="newest">Nouveautés d'abord</option>
             <option value="price_asc">Prix croissant</option>
             <option value="price_desc">Prix décroissant</option>
           </select>
@@ -164,8 +194,9 @@ export default function PropertiesPage() {
                 <option value="">Tous les types</option>
                 <option value="villa-duplex">Villa &amp; Duplex</option>
                 <option value="appartement-studio">Appartement &amp; Studio</option>
-                <option value="terrain-titre-parcelle">Terrain titré &amp; Parcelle</option>
+                <option value="terrain-titre">Terrain titré &amp; Parcelle</option>
                 <option value="immeuble-bureau">Immeuble &amp; Bureau</option>
+                <option value="commerce-local">Commerce &amp; Local</option>
               </select>
             </div>
 

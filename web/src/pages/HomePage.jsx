@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Search, MapPin, Building, Key, Home, LandPlot, Store, ArrowRight, ShieldCheck, TrendingUp, CheckCircle, Award } from 'lucide-react';
 import api from '../services/api';
 import PropertyCard from '../components/PropertyCard';
+import HeroBannerCarousel from '../components/HeroBannerCarousel';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -40,8 +41,13 @@ export default function HomePage() {
 
   return (
     <div className="space-y-16">
-      {/* HERO SECTION / MOTEUR DE RECHERCHE PRINCIPAL (Inspiré de screen.png & standard mobile.de) */}
-      <section className="relative bg-[#0A1931] text-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* BANNIÈRE HERO MOBILE.DE AVEC CAROUSEL D'IMAGES */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <HeroBannerCarousel />
+      </section>
+
+      {/* SECTION MOTEUR DE RECHERCHE PRINCIPAL */}
+      <section className="relative bg-[#0A1931] text-white pt-10 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden rounded-3xl max-w-7xl mx-auto shadow-xl">
         {/* Glow & décor de fond */}
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#F5A623_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
@@ -124,8 +130,9 @@ export default function HomePage() {
                     <option value="">Tous les types</option>
                     <option value="villa-duplex">Villa &amp; Duplex</option>
                     <option value="appartement-studio">Appartement &amp; Studio</option>
-                    <option value="terrain-titre-parcelle">Terrain titré &amp; Parcelle</option>
+                    <option value="terrain-titre">Terrain titré &amp; Parcelle</option>
                     <option value="immeuble-bureau">Immeuble &amp; Bureau</option>
+                    <option value="commerce-local">Commerce &amp; Local</option>
                   </select>
                 </div>
               </div>
@@ -194,7 +201,7 @@ export default function HomePage() {
           </Link>
 
           {/* Terrains Titrés */}
-          <Link to="/properties?category=terrain-titre-parcelle" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
+          <Link to="/properties?category=terrain-titre" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
             <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
               <LandPlot className="w-6 h-6" />
             </div>

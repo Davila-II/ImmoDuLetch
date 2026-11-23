@@ -28,7 +28,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li><Link to="/properties?category=villa-duplex" className="hover:text-amber-400 transition">Villas &amp; Duplex de prestige</Link></li>
               <li><Link to="/properties?category=appartement-studio" className="hover:text-amber-400 transition">Appartements &amp; Penthouses</Link></li>
-              <li><Link to="/properties?category=terrain-titre-parcelle" className="hover:text-amber-400 transition">Terrains titrés &amp; Parcelles viabilisées</Link></li>
+              <li><Link to="/properties?category=terrain-titre" className="hover:text-amber-400 transition">Terrains titrés &amp; Parcelles viabilisées</Link></li>
               <li><Link to="/properties?category=immeuble-bureau" className="hover:text-amber-400 transition">Immeubles de rapport &amp; Rendement</Link></li>
               <li><Link to="/properties?city=Douala" className="hover:text-amber-400 transition">Biens à Douala (Bonapriso, Bonanjo, Akwa)</Link></li>
               <li><Link to="/properties?city=Yaounde" className="hover:text-amber-400 transition">Biens à Yaoundé (Bastos, Golf)</Link></li>
