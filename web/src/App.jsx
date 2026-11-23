@@ -28,6 +28,9 @@ export default function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/my-account" element={<AccountDashboardPage />} />
+              <Route path="/deposer" element={<SubmitPropertyPage />} />
+              <Route path="/deposer/:reference" element={<SubmitPropertyPage />} />
+              {/* Alias de compatibilité ascendante */}
               <Route path="/submit" element={<SubmitPropertyPage />} />
               <Route path="/submit/:reference" element={<SubmitPropertyPage />} />
             </Routes>
