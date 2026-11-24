@@ -7,8 +7,15 @@ export function toWhatsAppNumber(phone) {
   return digits.length === 9 ? `237${digits}` : digits;
 }
 
-// Lien WhatsApp vers le propriétaire du bien. Sans numéro, on utilise celui de la plateforme
-// (variable VITE_WHATSAPP_NUMBER, facultative) ; sinon, aucun lien.
+// Numéro WhatsApp de la plateforme (variable VITE_WHATSAPP_NUMBER, dans web/.env.local)
+export function platformWhatsAppLink(text = '') {
+  const number = toWhatsAppNumber(import.meta.env.VITE_WHATSAPP_NUMBER);
+  if (!number) return null;
+
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
+}
+
+// Lien WhatsApp vers le propriétaire du bien. Sans numéro, on utilise celui de la plateforme ; sinon, aucun lien.
 export function whatsAppLink(phone, reference) {
   const number = toWhatsAppNumber(phone) || toWhatsAppNumber(import.meta.env.VITE_WHATSAPP_NUMBER);
   if (!number) return null;
