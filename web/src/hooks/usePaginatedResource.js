@@ -3,19 +3,23 @@ import api from '../services/api';
 
 const NOT_EXTRA = ['data', 'meta', 'links'];
 
-// Sépare la réponse paginée de Laravel : éléments, pagination et champs supplémentaires (ex. « stats »)
+// Sépare la réponse paginée de Laravel : éléments, total, pagination et champs supplémentaires (ex. « stats »)
 function parse(payload) {
   return {
     items: payload.data,
+    total: payload.meta.total,
     page: payload.meta.current_page,
     lastPage: payload.meta.last_page,
     extra: Object.fromEntries(Object.entries(payload).filter(([key]) => !NOT_EXTRA.includes(key))),
   };
 }
 
+// À utiliser avec une « key » qui change quand le chemin change : le composant est alors recréé,
+// ce qui remet proprement l'état « chargement ».
 export function usePaginatedResource(path) {
   const [state, setState] = useState({
     items: [],
+    total: 0,
     page: 1,
     lastPage: 1,
     extra: {},
@@ -63,6 +67,7 @@ export function usePaginatedResource(path) {
       setState((prev) => ({
         ...prev,
         items: [...prev.items, ...next.items],
+        total: next.total,
         page: next.page,
         lastPage: next.lastPage,
         extra: next.extra,
@@ -76,8 +81,19 @@ export function usePaginatedResource(path) {
   const updateItems = useCallback((updater) => setState((prev) => ({ ...prev, items: updater(prev.items) })), []);
   const updateExtra = useCallback((updater) => setState((prev) => ({ ...prev, extra: updater(prev.extra) })), []);
 
+  // Retire des éléments de la liste (par exemple un favori supprimé) et ajuste le total
+  const removeWhere = useCallback(
+    (predicate) =>
+      setState((prev) => {
+        const items = prev.items.filter((item) => !predicate(item));
+        return { ...prev, items, total: Math.max(0, prev.total - (prev.items.length - items.length)) };
+      }),
+    []
+  );
+
   return {
     items: state.items,
+    total: state.total,
     extra: state.extra,
     loading: state.loading,
     loadingMore: state.loadingMore,
@@ -87,5 +103,6 @@ export function usePaginatedResource(path) {
     loadMore,
     updateItems,
     updateExtra,
+    removeWhere,
   };
 }
