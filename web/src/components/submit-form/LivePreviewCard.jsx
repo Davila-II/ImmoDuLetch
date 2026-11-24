@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 
 // Libellés des statuts fonciers : toujours présentés comme déclarés par le vendeur

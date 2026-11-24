@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { UploadCloud, Trash2, Star, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const MIN_PHOTOS = 3;

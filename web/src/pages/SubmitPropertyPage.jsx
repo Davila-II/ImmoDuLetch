@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { useSubmitProperty } from '../hooks/useSubmitProperty';
 
 import StepperHeader from '../components/submit-form/StepperHeader';

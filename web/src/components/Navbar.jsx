@@ -1,8 +1,7 @@
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart, User, PlusCircle, Search, ShieldCheck } from 'lucide-react';
 import logo from '../assets/immo.png';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Navbar() {
   const { user } = useAuth();

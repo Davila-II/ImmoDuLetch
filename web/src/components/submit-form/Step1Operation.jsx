@@ -1,4 +1,3 @@
-import React from 'react';
 import { Home, Building, MapPin, Building2, Store, Package } from 'lucide-react';
 import { useCatalog } from '../../hooks/useCatalog';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck, AlertTriangle, FileCheck, HelpCircle, Minus, Plus, Check } from 'lucide-react';
 import { useCatalog } from '../../hooks/useCatalog';
 

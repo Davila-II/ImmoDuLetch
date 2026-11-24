@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck, Info } from 'lucide-react';
 
 const MAX_DESCRIPTION = 5000;

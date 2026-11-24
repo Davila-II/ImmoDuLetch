@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ArrowRight, LogIn } from 'lucide-react';
 import api from '../services/api';
 import PropertyCard from '../components/PropertyCard';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export default function FavoritesPage() {
   const { user, loading: authLoading } = useAuth();
