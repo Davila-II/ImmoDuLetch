@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, MapPin, Building, Key, Home, LandPlot, Store, ArrowRight, ShieldCheck, TrendingUp, CheckCircle, Award } from 'lucide-react';
+import { 
+  Search, MapPin, Building, Key, Home, LandPlot, Store, 
+  ArrowRight, ShieldCheck, TrendingUp, CheckCircle, Award, 
+  Phone, MessageSquare, CheckCircle2 
+} from 'lucide-react';
 import api from '../services/api';
 import PropertyCard from '../components/PropertyCard';
 import HeroBannerCarousel from '../components/HeroBannerCarousel';
@@ -15,11 +19,21 @@ export default function HomePage() {
   const [recentProperties, setRecentProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // État formulaire estimation
+  const [estimationData, setEstimationData] = useState({
+    location: '',
+    assetType: 'Villa / Duplex',
+    area: '',
+    name: '',
+    phone: '',
+  });
+  const [estimationSubmitted, setEstimationSubmitted] = useState(false);
+
   useEffect(() => {
     const fetchRecent = async () => {
       try {
         const response = await api.get('/properties?per_page=6');
-        setRecentProperties(response.data.data || []);
+        setRecentProperties(response.data?.data || []);
       } catch (err) {
         console.error('Erreur chargement biens récents', err);
       } finally {
@@ -29,6 +43,11 @@ export default function HomePage() {
     fetchRecent();
   }, []);
 
+  const handleTransactionTypeChange = (type) => {
+    setTransactionType(type);
+    setMaxPrice(''); // Réinitialisation du budget quand on change de mode
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     const params = new URLSearchParams();
@@ -37,6 +56,21 @@ export default function HomePage() {
     if (category) params.append('category', category);
     if (maxPrice) params.append('max_price', maxPrice);
     navigate(`/properties?${params.toString()}`);
+  };
+
+  const handleEstimationSubmit = (e) => {
+    e.preventDefault();
+    // Ouvrir WhatsApp avec message structuré ou confirmer la réception
+    const text = encodeURIComponent(
+      `Bonjour Immo du Letch, je souhaite une estimation pour mon bien :\n` +
+      `- Localisation : ${estimationData.location}\n` +
+      `- Type : ${estimationData.assetType}\n` +
+      `- Superficie : ${estimationData.area || 'Non précisée'} m²\n` +
+      `- Propriétaire : ${estimationData.name}\n` +
+      `- Téléphone : ${estimationData.phone}`
+    );
+    window.open(`https://wa.me/237699452810?text=${text}`, '_blank');
+    setEstimationSubmitted(true);
   };
 
   return (
@@ -70,7 +104,7 @@ export default function HomePage() {
             <div className="flex border-b border-slate-200 pb-3 mb-4 gap-2">
               <button
                 type="button"
-                onClick={() => setTransactionType('sale')}
+                onClick={() => handleTransactionTypeChange('sale')}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition ${
                   transactionType === 'sale'
                     ? 'bg-[#0A1931] text-white'
@@ -82,7 +116,7 @@ export default function HomePage() {
               </button>
               <button
                 type="button"
-                onClick={() => setTransactionType('rent')}
+                onClick={() => handleTransactionTypeChange('rent')}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition ${
                   transactionType === 'rent'
                     ? 'bg-[#0A1931] text-white'
@@ -137,10 +171,10 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Budget Max */}
+              {/* Budget Max adapté : Vente vs Location */}
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                  Budget max (FCFA)
+                  {transactionType === 'sale' ? 'Budget max (FCFA)' : 'Loyer max / mois (FCFA)'}
                 </label>
                 <select
                   value={maxPrice}
@@ -148,11 +182,25 @@ export default function HomePage() {
                   className="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#0A1931]"
                 >
                   <option value="">Indifférent</option>
-                  <option value="50000000">50 000 000 FCFA</option>
-                  <option value="100000000">100 000 000 FCFA</option>
-                  <option value="200000000">200 000 000 FCFA</option>
-                  <option value="350000000">350 000 000 FCFA</option>
-                  <option value="500000000">500 000 000 FCFA+</option>
+                  {transactionType === 'sale' ? (
+                    <>
+                      <option value="25000000">25 000 000 FCFA</option>
+                      <option value="50000000">50 000 000 FCFA</option>
+                      <option value="100000000">100 000 000 FCFA</option>
+                      <option value="200000000">200 000 000 FCFA</option>
+                      <option value="350000000">350 000 000 FCFA</option>
+                      <option value="500000000">500 000 000 FCFA+</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="100000">100 000 FCFA / mois</option>
+                      <option value="200000">200 000 FCFA / mois</option>
+                      <option value="350000">350 000 FCFA / mois</option>
+                      <option value="500000">500 000 FCFA / mois</option>
+                      <option value="1000000">1 000 000 FCFA / mois</option>
+                      <option value="2500000">2 500 000 FCFA+ / mois</option>
+                    </>
+                  )}
                 </select>
               </div>
 
@@ -171,7 +219,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* TYPOLOGIES D'INVESTISSEMENT (Cartes interactives - screen.png) */}
+      {/* TYPOLOGIES D'INVESTISSEMENT (Cartes interactives) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -200,14 +248,14 @@ export default function HomePage() {
             </div>
           </Link>
 
-          {/* Terrains Titrés */}
+          {/* Terrains & Parcelles */}
           <Link to="/properties?category=terrain-titre" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
-            <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
+            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
               <LandPlot className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-slate-900 text-lg mb-2">Terrains Titrés &amp; Bornés</h3>
+            <h3 className="font-bold text-slate-900 text-lg mb-2">Terrains avec Titre Foncier</h3>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              Lots vérifiés au cadastre, bornage contradictoire, vue mer à Kribi ou parcelles viabilisées à Yassa et Odza.
+              Lots constructibles audités, sans litige coutumier, prêts pour mutation totale ou morcellement notarié.
             </p>
             <div className="text-xs font-bold text-[#0A1931] flex items-center gap-1">
               <span>Voir les offres</span>
@@ -215,14 +263,14 @@ export default function HomePage() {
             </div>
           </Link>
 
-          {/* Immeubles & Appartements */}
-          <Link to="/properties?category=appartement-studio" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
-            <div className="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
+          {/* Immeubles de rapport */}
+          <Link to="/properties?category=immeuble-bureau" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
+            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
               <Building className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-slate-900 text-lg mb-2">Immeubles &amp; Appartements</h3>
+            <h3 className="font-bold text-slate-900 text-lg mb-2">Immeubles de Rapport</h3>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              Monopropriétés locatives R+3/R+4, appartements meublés pour expatriés et résidences à haut rendement.
+              Actifs générateurs de cashflow locatif immédiat (R+2 à R+5), studios meublés et bureaux d'entreprises.
             </p>
             <div className="text-xs font-bold text-[#0A1931] flex items-center gap-1">
               <span>Voir les offres</span>
@@ -230,14 +278,14 @@ export default function HomePage() {
             </div>
           </Link>
 
-          {/* Commerces & Bureaux */}
-          <Link to="/properties?category=immeuble-bureau" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
-            <div className="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
+          {/* Locaux commerciaux */}
+          <Link to="/properties?category=commerce-local" className="bg-white p-6 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-lg transition group">
+            <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center mb-4 group-hover:bg-[#0A1931] group-hover:text-amber-400 transition">
               <Store className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-slate-900 text-lg mb-2">Commerces &amp; Bureaux</h3>
+            <h3 className="font-bold text-slate-900 text-lg mb-2">Commerces &amp; Entrepôts</h3>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              Plateaux d'affaires à Akwa et Bonanjo, locaux commerciaux en pied d'immeuble et entrepôts logistiques.
+              Surfaces commerciales stratégiques en bordure d'axes lourds à Akwa, Bonabéri, Biyem-Assi et Mokolo.
             </p>
             <div className="text-xs font-bold text-[#0A1931] flex items-center gap-1">
               <span>Voir les offres</span>
@@ -247,15 +295,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* BIENS RÉCEMMENT PUBLIÉS */}
+      {/* DERNIÈRES ANNONCES AUDITÉES */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Sélection Certifiée</span>
-            <h2 className="text-2xl font-bold text-slate-900 mt-1">Biens Récemment Publiés</h2>
+            <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Sélection Vérifiée</span>
+            <h2 className="text-2xl font-bold text-slate-900 mt-1">Dernières Opportunités Certifiées</h2>
           </div>
           <Link to="/properties" className="text-sm font-semibold text-[#0A1931] hover:text-amber-600 flex items-center gap-1">
-            <span>Voir tout</span>
+            <span>Voir tout ({recentProperties.length})</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -279,7 +327,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* BANNIÈRE ESTIMATION ET VENTE SÉCURISÉE (screen.png) */}
+      {/* BANNIÈRE ESTIMATION ET VENTE SÉCURISÉE */}
       <section id="estimation" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-[#0A1931] rounded-2xl p-8 sm:p-12 text-white grid grid-cols-1 lg:grid-cols-2 gap-8 items-center shadow-xl">
           <div className="space-y-6">
@@ -309,45 +357,99 @@ export default function HomePage() {
           </div>
 
           <div className="bg-white rounded-xl p-6 text-slate-800 shadow-lg">
-            <h3 className="font-bold text-lg text-slate-900 mb-2">Estimation Gratuite &amp; Confidentielle</h3>
-            <p className="text-xs text-slate-500 mb-4">Sans engagement • Expertise Cadastrale</p>
+            <h3 className="font-bold text-lg text-slate-900 mb-1">Estimation Gratuite &amp; Confidentielle</h3>
+            <p className="text-xs text-slate-500 mb-4">Sans engagement • Expertise Cadastrale certifiée</p>
             
-            <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); alert("Demande d'estimation enregistrée ! Nos experts vous contacteront."); }}>
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">Localisation du bien</label>
-                <input 
-                  type="text" 
-                  placeholder="Ex : Douala, Bonapriso" 
-                  className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50"
-                  required 
-                />
+            {estimationSubmitted ? (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                <h4 className="font-bold text-emerald-900 text-sm">Demande d'estimation transmise !</h4>
+                <p className="text-xs text-emerald-700">
+                  Nos experts géomètres et notaires partenaires analysent vos informations pour vous contacter sous 24h ouvrées.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setEstimationSubmitted(false)}
+                  className="mt-3 text-xs text-slate-500 underline hover:text-slate-700"
+                >
+                  Estimer un autre bien
+                </button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+            ) : (
+              <form className="space-y-3" onSubmit={handleEstimationSubmit}>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Type d'actif</label>
-                  <select className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50">
-                    <option>Villa / Duplex</option>
-                    <option>Terrain titré</option>
-                    <option>Appartement</option>
-                    <option>Immeuble</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Superficie (m²)</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Localisation du bien</label>
                   <input 
-                    type="number" 
-                    placeholder="Ex : 500" 
-                    className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50" 
+                    type="text" 
+                    placeholder="Ex : Douala, Bonapriso ou Yaoundé, Bastos" 
+                    value={estimationData.location}
+                    onChange={(e) => setEstimationData({ ...estimationData, location: e.target.value })}
+                    className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#0A1931]"
+                    required 
                   />
                 </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-sm transition mt-2"
-              >
-                Estimer mon bien au Cameroun →
-              </button>
-            </form>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Type d'actif</label>
+                    <select 
+                      value={estimationData.assetType}
+                      onChange={(e) => setEstimationData({ ...estimationData, assetType: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#0A1931]"
+                    >
+                      <option value="Villa / Duplex">Villa / Duplex</option>
+                      <option value="Terrain titré">Terrain titré</option>
+                      <option value="Appartement">Appartement</option>
+                      <option value="Immeuble">Immeuble</option>
+                      <option value="Commerce">Commerce / Entrepôt</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Superficie (m²)</label>
+                    <input 
+                      type="number" 
+                      placeholder="Ex : 500" 
+                      value={estimationData.area}
+                      onChange={(e) => setEstimationData({ ...estimationData, area: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#0A1931]" 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Votre nom</label>
+                    <input 
+                      type="text" 
+                      placeholder="Nom complet" 
+                      value={estimationData.name}
+                      onChange={(e) => setEstimationData({ ...estimationData, name: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#0A1931]"
+                      required 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1">Téléphone / WhatsApp</label>
+                    <input 
+                      type="tel" 
+                      placeholder="+237 6..." 
+                      value={estimationData.phone}
+                      onChange={(e) => setEstimationData({ ...estimationData, phone: e.target.value })}
+                      className="w-full text-sm px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#0A1931]"
+                      required 
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-sm transition mt-2 flex items-center justify-center gap-2 shadow-xs"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Estimer &amp; Transmettre via WhatsApp →</span>
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
