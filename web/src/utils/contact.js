@@ -1,16 +1,14 @@
-import api from '../services/api';
+import { normalizePhone } from './phone';
 
-// Transforme un numéro saisi (« +237 699 45 28 10 », « 699452810 »…) en numéro international pour wa.me
+// Numéro au format international sans « + » pour wa.me (9 chiffres : on ajoute l'indicatif 237)
 export function toWhatsAppNumber(phone) {
-  const digits = String(phone || '').replace(/\D/g, '');
+  const digits = normalizePhone(phone).replace(/\D/g, '');
   if (!digits) return null;
-
-  // Numéro camerounais à 9 chiffres sans indicatif : on ajoute 237
   return digits.length === 9 ? `237${digits}` : digits;
 }
 
-// Lien WhatsApp vers le propriétaire du bien. Si le bien n'a pas de numéro, on utilise
-// celui de la plateforme (variable VITE_WHATSAPP_NUMBER, facultative) ; sinon, aucun lien.
+// Lien WhatsApp vers le propriétaire du bien. Sans numéro, on utilise celui de la plateforme
+// (variable VITE_WHATSAPP_NUMBER, facultative) ; sinon, aucun lien.
 export function whatsAppLink(phone, reference) {
   const number = toWhatsAppNumber(phone) || toWhatsAppNumber(import.meta.env.VITE_WHATSAPP_NUMBER);
   if (!number) return null;
@@ -19,8 +17,7 @@ export function whatsAppLink(phone, reference) {
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }
 
-// Enregistre un clic « WhatsApp » ou « Appeler » : il alimente le compteur de contacts du propriétaire.
-// Sans attente et sans erreur visible : un échec ne doit jamais empêcher d'ouvrir WhatsApp.
-export function trackContact(reference, type) {
-  api.post(`/properties/${reference}/inquiries`, { type }).catch(() => {});
+export function phoneHref(phone) {
+  const normalized = normalizePhone(phone);
+  return normalized ? `tel:${normalized}` : null;
 }
