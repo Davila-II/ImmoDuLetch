@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthProvider';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import RequireAuth from './components/RequireAuth';
+import RequireAdmin from './components/RequireAdmin';
 
 import HomePage from './pages/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
@@ -12,6 +13,9 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AccountDashboardPage from './pages/AccountDashboardPage';
 import SubmitPropertyPage from './pages/SubmitPropertyPage';
+import AdminPage from './pages/AdminPage';
+import ConditionsPage from './pages/ConditionsPage';
+import PrivacyPage from './pages/PrivacyPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Pages réservées aux utilisateurs connectés
@@ -43,11 +47,21 @@ export default function App() {
                   </RequireAuth>
                 }
               />
+              <Route
+                path="/admin"
+                element={
+                  <RequireAdmin>
+                    <AdminPage />
+                  </RequireAdmin>
+                }
+              />
               <Route path="/deposer" element={protectedSubmit} />
               <Route path="/deposer/:reference" element={protectedSubmit} />
               {/* Alias de compatibilité ascendante */}
               <Route path="/submit" element={protectedSubmit} />
               <Route path="/submit/:reference" element={protectedSubmit} />
+              <Route path="/conditions" element={<ConditionsPage />} />
+              <Route path="/confidentialite" element={<PrivacyPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>

@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
-import { LogOut, Plus } from 'lucide-react';
+import { LogOut, Plus, ShieldCheck } from 'lucide-react';
 
 function accountLabel(user) {
+  if (user?.role === 'admin') return 'Administrateur';
   if (user?.account_type === 'agence') return user.agency?.is_certified ? 'Agence certifiée' : 'Compte agence';
   return user?.account_type === 'independant' ? 'Indépendant' : 'Particulier';
 }
 
 export default function ProfileHeader({ user, onLogout }) {
+  const isAdmin = user?.role === 'admin';
+
   return (
     <div className="bg-[#0A1931] text-white p-5 sm:p-8 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
       <div className="flex items-center gap-3.5 sm:gap-4">
@@ -28,6 +31,16 @@ export default function ProfileHeader({ user, onLogout }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="flex-1 md:flex-initial justify-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm"
+          >
+            <ShieldCheck className="w-4 h-4 text-amber-300" />
+            <span>Administration</span>
+          </Link>
+        )}
+
         <Link
           to="/deposer"
           className="flex-1 md:flex-initial justify-center bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 transition shadow-sm"

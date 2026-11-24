@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Heart, LogOut, Menu, PlusCircle, User, X } from 'lucide-react';
+import { Heart, LogOut, Menu, PlusCircle, ShieldCheck, User, X } from 'lucide-react';
 import logo from '../assets/immo.png';
 import { NAV_LINKS } from '../constants/navigation';
 import { TOP_BANNER } from '../constants/siteContent';
@@ -10,6 +10,8 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+
+  const isAdmin = user?.role === 'admin';
 
   // Fermer automatiquement le menu mobile lors d'un changement de page
   useEffect(() => {
@@ -32,7 +34,7 @@ export default function Navbar() {
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      {/* Top banner info (desktop et tablettes) */}
+      {/* Top banner info */}
       <div className="bg-[#0A1931] text-[11px] sm:text-xs text-slate-300 py-1.5 px-4 hidden md:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4 lg:gap-6">
@@ -63,6 +65,15 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 bg-indigo-50 px-2.5 py-1 rounded-lg transition"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Admin</span>
+              </Link>
+            )}
           </nav>
 
           {/* Actions Droite */}
@@ -77,7 +88,7 @@ export default function Navbar() {
               <Heart className="w-5 h-5" />
             </Link>
 
-            {/* Espace Compte (Desktop / Tablette) */}
+            {/* Espace Compte */}
             <Link
               to={user ? '/my-account' : '/login'}
               className="hidden sm:flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition"
@@ -86,7 +97,7 @@ export default function Navbar() {
               <span>{user ? user.name?.split(' ')[0] : 'Mon espace'}</span>
             </Link>
 
-            {/* Bouton Déposer une annonce (adaptatif mobile) */}
+            {/* Bouton Déposer une annonce */}
             <Link
               to="/deposer"
               className="flex items-center gap-1.5 sm:gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold shadow-xs transition"
@@ -110,13 +121,10 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Menu Drawer Mobile Déroulant & Plein écran */}
+      {/* Menu Drawer Mobile */}
       {menuOpen && (
         <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-slate-900/40 backdrop-blur-xs z-50 flex flex-col justify-between">
-          <nav
-            className="bg-white border-t border-slate-200 px-5 py-6 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl"
-          >
-            {/* Liens de navigation principaux */}
+          <nav className="bg-white border-t border-slate-200 px-5 py-6 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl">
             <div className="space-y-1">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
                 Navigation
@@ -131,11 +139,21 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  onClick={closeMenu}
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-base font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition"
+                >
+                  <ShieldCheck className="w-5 h-5 text-indigo-600" />
+                  <span>Panneau d'administration</span>
+                </Link>
+              )}
             </div>
 
             <hr className="border-slate-100" />
 
-            {/* Actions rapides mobile */}
             <div className="space-y-2">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
                 Mon Espace Immo
@@ -195,7 +213,6 @@ export default function Navbar() {
 
             <hr className="border-slate-100" />
 
-            {/* Bouton Proéminent Déposer */}
             <div>
               <Link
                 to="/deposer"
