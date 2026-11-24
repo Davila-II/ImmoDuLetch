@@ -28,33 +28,33 @@ export default function LoginPromptToast({ onClose, autoCloseMs = 4000 }) {
     <div
       role="alert"
       aria-live="assertive"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3
-                 bg-[#0A1931] text-white px-4 py-3 rounded-xl shadow-2xl max-w-sm w-full mx-4"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 sm:gap-3
+                 bg-[#0A1931] text-white px-3.5 sm:px-4 py-3 rounded-2xl shadow-2xl w-[calc(100%-2rem)] max-w-sm"
     >
       <span className="shrink-0 bg-rose-500 p-2 rounded-full">
         <Heart className="w-4 h-4 fill-white text-white" />
       </span>
 
-      <div className="flex-1 text-sm leading-snug">
-        <p className="font-semibold">Connectez-vous pour sauvegarder</p>
-        <p className="text-slate-300 text-xs mt-0.5">Vos favoris sont synchronisés sur tous vos appareils.</p>
+      <div className="flex-1 text-xs sm:text-sm leading-snug overflow-hidden">
+        <p className="font-semibold truncate">Connectez-vous pour sauvegarder</p>
+        <p className="text-slate-300 text-[11px] sm:text-xs mt-0.5 truncate">Synchronisez vos favoris partout.</p>
       </div>
 
       <button
         type="button"
         onClick={handleLogin}
-        className="shrink-0 flex items-center gap-1.5 bg-[#F5A623] hover:bg-amber-500
-                   text-slate-950 text-xs font-bold px-3 py-1.5 rounded-lg transition"
+        className="shrink-0 flex items-center gap-1 bg-[#F5A623] hover:bg-amber-500
+                   text-slate-950 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg transition"
       >
         <LogIn className="w-3.5 h-3.5" />
-        Se connecter
+        <span className="hidden xs:inline">Connexion</span>
       </button>
 
       <button
         type="button"
         onClick={onClose}
         aria-label="Fermer"
-        className="shrink-0 text-slate-400 hover:text-white transition"
+        className="shrink-0 text-slate-400 hover:text-white transition p-1"
       >
         <X className="w-4 h-4" />
       </button>

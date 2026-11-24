@@ -1,41 +1,63 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Menu, PlusCircle, User, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Heart, LogOut, Menu, PlusCircle, User, X } from 'lucide-react';
 import logo from '../assets/immo.png';
 import { NAV_LINKS } from '../constants/navigation';
 import { TOP_BANNER } from '../constants/siteContent';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Fermer automatiquement le menu mobile lors d'un changement de page
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  // Empêcher le scroll du body quand le menu mobile plein écran est ouvert
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-      <div className="bg-[#0A1931] text-xs text-slate-300 py-1.5 px-4 hidden md:block">
+      {/* Top banner info (desktop et tablettes) */}
+      <div className="bg-[#0A1931] text-[11px] sm:text-xs text-slate-300 py-1.5 px-4 hidden md:block">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 lg:gap-6">
             <span className="flex items-center gap-1.5 font-medium text-amber-400">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               {TOP_BANNER.highlight}
             </span>
             {TOP_BANNER.points.map((point) => (
-              <span key={point}>• {point}</span>
+              <span key={point} className="hidden lg:inline">• {point}</span>
             ))}
           </div>
           <span className="text-slate-400">{TOP_BANNER.cities}</span>
         </div>
       </div>
 
+      {/* Barre de navigation principale */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-3" onClick={closeMenu}>
-            <img src={logo} alt="Immo du Letch" className="h-14 w-auto object-contain" />
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo officiel */}
+          <Link to="/" className="flex items-center gap-2 shrink-0 py-2" onClick={closeMenu}>
+            <img src={logo} alt="Immo du Letch" className="h-10 sm:h-14 w-auto object-contain" />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-8 font-medium text-slate-700 text-sm">
+          {/* Liens Desktop */}
+          <nav className="hidden lg:flex items-center gap-6 xl:gap-8 font-medium text-slate-700 text-sm">
             {NAV_LINKS.map((link) => (
               <Link key={link.label} to={link.to} className="hover:text-[#0A1931] transition">
                 {link.label}
@@ -43,58 +65,149 @@ export default function Navbar() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* Actions Droite */}
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Bouton Favoris */}
             <Link
               to="/favorites"
-              className="p-2.5 text-slate-600 hover:text-rose-500 hover:bg-slate-100 rounded-full transition"
+              className="p-2 sm:p-2.5 text-slate-600 hover:text-rose-500 hover:bg-slate-100 rounded-full transition"
               title="Mes favoris"
               aria-label="Mes favoris"
             >
               <Heart className="w-5 h-5" />
             </Link>
 
+            {/* Espace Compte (Desktop / Tablette) */}
             <Link
               to={user ? '/my-account' : '/login'}
-              className="flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition"
             >
               <User className="w-4 h-4 text-slate-500" />
-              <span className="hidden sm:inline">{user ? user.name?.split(' ')[0] : 'Mon espace'}</span>
+              <span>{user ? user.name?.split(' ')[0] : 'Mon espace'}</span>
             </Link>
 
+            {/* Bouton Déposer une annonce (adaptatif mobile) */}
             <Link
               to="/deposer"
-              className="flex items-center gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 px-3 sm:px-4 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition"
+              className="flex items-center gap-1.5 sm:gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold shadow-xs transition"
             >
-              <PlusCircle className="w-4 h-4" />
-              <span className="hidden sm:inline">Déposer une annonce</span>
+              <PlusCircle className="w-4 h-4 shrink-0" />
+              <span className="hidden xs:inline sm:inline">Déposer</span>
+              <span className="hidden sm:inline">une annonce</span>
             </Link>
 
+            {/* Hamburger menu mobile */}
             <button
               type="button"
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
-              aria-label="Menu"
-              className="lg:hidden p-2.5 text-slate-700 hover:bg-slate-100 rounded-lg transition"
+              aria-label="Ouvrir le menu de navigation"
+              className="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-lg transition"
             >
-              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
       </div>
 
+      {/* Menu Drawer Mobile Déroulant & Plein écran */}
       {menuOpen && (
-        <nav className="lg:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-1">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.label}
-              to={link.to}
-              onClick={closeMenu}
-              className="block px-3 py-2.5 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-slate-900/40 backdrop-blur-xs z-50 flex flex-col justify-between">
+          <nav
+            className="bg-white border-t border-slate-200 px-5 py-6 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl"
+          >
+            {/* Liens de navigation principaux */}
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
+                Navigation
+              </span>
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  onClick={closeMenu}
+                  className="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-800 hover:bg-slate-100 active:bg-slate-200 transition"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            <hr className="border-slate-100" />
+
+            {/* Actions rapides mobile */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
+                Mon Espace Immo
+              </span>
+
+              <Link
+                to="/favorites"
+                onClick={closeMenu}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition"
+              >
+                <Heart className="w-5 h-5 text-rose-500" />
+                <span>Mes Biens Favoris</span>
+              </Link>
+
+              {user ? (
+                <>
+                  <Link
+                    to="/my-account"
+                    onClick={closeMenu}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
+                  >
+                    <User className="w-5 h-5 text-slate-500" />
+                    <span>Mon tableau de bord ({user.name})</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      closeMenu();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition text-left"
+                  >
+                    <LogOut className="w-5 h-5 text-rose-500" />
+                    <span>Se déconnecter</span>
+                  </button>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Link
+                    to="/login"
+                    onClick={closeMenu}
+                    className="text-center py-2.5 px-3 rounded-xl border border-slate-300 font-bold text-xs text-slate-800 hover:bg-slate-50"
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={closeMenu}
+                    className="text-center py-2.5 px-3 rounded-xl bg-[#0A1931] text-white font-bold text-xs hover:bg-slate-800"
+                  >
+                    Inscription
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <hr className="border-slate-100" />
+
+            {/* Bouton Proéminent Déposer */}
+            <div>
+              <Link
+                to="/deposer"
+                onClick={closeMenu}
+                className="w-full flex items-center justify-center gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 px-4 rounded-xl text-sm shadow-md transition"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Déposer une annonce certifiée</span>
+              </Link>
+            </div>
+          </nav>
+        </div>
       )}
     </header>
   );

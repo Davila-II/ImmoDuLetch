@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, RefreshCw } from 'lucide-react';
+import { Filter, RefreshCw, X } from 'lucide-react';
 import SelectField from '../ui/SelectField';
 import { CITY_OPTIONS } from '../../constants/cities';
 import { LAND_STATUS_LABELS } from '../../constants/landStatus';
@@ -19,11 +19,9 @@ const BEDROOM_CHOICES = [
 const LAND_STATUS_OPTIONS = Object.entries(LAND_STATUS_LABELS).map(([value, label]) => ({ value, label }));
 
 const onlyDigits = (value) => value.replace(/\D/g, '');
-const fieldClass = 'w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs';
+const fieldClass = 'w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 sm:p-2 text-xs';
 
-// Le brouillon des filtres reste local jusqu'à « Appliquer ». Le parent recrée ce composant (« key »)
-// quand l'adresse change, ce qui remet les champs à jour (retour arrière, clic sur une catégorie…).
-export default function FilterPanel({ initial, onApply, onReset }) {
+export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = false, onCloseMobile }) {
   const { categories } = useCatalog();
   const [draft, setDraft] = useState(initial);
 
@@ -33,19 +31,41 @@ export default function FilterPanel({ initial, onApply, onReset }) {
   const handleSubmit = (event) => {
     event.preventDefault();
     onApply(draft);
+    if (onCloseMobile) onCloseMobile();
   };
 
-  return (
-    <aside className="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 h-fit space-y-6 shadow-xs">
+  const handleReset = () => {
+    onReset();
+    if (onCloseMobile) onCloseMobile();
+  };
+
+  const panelContent = (
+    <div className="bg-white p-5 rounded-2xl border border-slate-200 space-y-6 shadow-xs">
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <span className="font-bold text-slate-900 text-sm flex items-center gap-2">
           <Filter className="w-4 h-4 text-amber-500" />
-          Filtres
+          Filtres de recherche
         </span>
-        <button type="button" onClick={onReset} className="text-xs text-slate-400 hover:text-slate-700 flex items-center gap-1">
-          <RefreshCw className="w-3 h-3" />
-          Effacer
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-xs text-slate-400 hover:text-slate-700 flex items-center gap-1 transition"
+          >
+            <RefreshCw className="w-3 h-3" />
+            Effacer
+          </button>
+          {onCloseMobile && (
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="lg:hidden p-1 text-slate-400 hover:text-slate-700 rounded-md"
+              aria-label="Fermer les filtres"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
@@ -59,7 +79,7 @@ export default function FilterPanel({ initial, onApply, onReset }) {
                 onClick={() =>
                   setDraft((prev) => ({ ...prev, transaction_type: prev.transaction_type === value ? '' : value }))
                 }
-                className={`py-2 px-3 rounded-lg border font-medium text-center transition ${
+                className={`py-2.5 sm:py-2 px-3 rounded-lg border font-medium text-center transition ${
                   draft.transaction_type === value
                     ? 'bg-[#0A1931] text-white border-[#0A1931]'
                     : 'border-slate-200 text-slate-700 hover:bg-slate-50'
@@ -121,7 +141,7 @@ export default function FilterPanel({ initial, onApply, onReset }) {
                 key={label}
                 type="button"
                 onClick={() => setDraft((prev) => ({ ...prev, min_bedrooms: value }))}
-                className={`flex-1 py-1.5 rounded border text-center font-medium ${
+                className={`flex-1 py-2 sm:py-1.5 rounded border text-center font-medium ${
                   draft.min_bedrooms === value
                     ? 'bg-[#0A1931] text-white border-[#0A1931]'
                     : 'border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -144,11 +164,31 @@ export default function FilterPanel({ initial, onApply, onReset }) {
 
         <button
           type="submit"
-          className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-xs transition shadow-xs"
+          className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 sm:py-2.5 rounded-xl sm:rounded-lg text-xs transition shadow-xs"
         >
           Appliquer les filtres
         </button>
       </form>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Version Desktop : aside normal */}
+      <aside className="hidden lg:block lg:col-span-1 h-fit sticky top-24">
+        {panelContent}
+      </aside>
+
+      {/* Version Mobile : Drawer / Modal au-dessus du contenu */}
+      {isOpenMobile && (
+        <div className="lg:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+          <div
+            className="bg-white w-full max-w-lg max-h-[85vh] sm:rounded-2xl rounded-t-2xl overflow-y-auto p-4 sm:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300"
+          >
+            {panelContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

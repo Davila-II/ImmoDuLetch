@@ -8,16 +8,19 @@ const STEPS = [
 ];
 
 export default function StepperHeader({ currentStep, reference, isSaving }) {
+  const currentStepObj = STEPS.find((s) => s.id === currentStep) || STEPS[0];
+  const progressPercent = ((currentStep - 1) / (STEPS.length - 1)) * 100;
+
   return (
-    <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-8 mb-8 shadow-xs">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="bg-white border-b border-slate-200 py-4 px-4 sm:px-8 mb-6 sm:mb-8 shadow-xs">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Espace vendeur</p>
-          <h1 className="text-xl sm:text-2xl font-black text-[#0A1931]">Déposer une annonce immobilière</h1>
+          <p className="text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider mb-0.5">Espace vendeur</p>
+          <h1 className="text-lg sm:text-2xl font-black text-[#0A1931]">Déposer une annonce immobilière</h1>
         </div>
 
         {reference && (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 self-start md:self-auto">
             <span className={`w-2 h-2 rounded-full ${isSaving ? 'bg-amber-500 animate-ping' : 'bg-emerald-500'}`} />
             <span className="font-mono font-semibold">Réf : {reference}</span>
             <span className="text-emerald-600">• {isSaving ? 'Enregistrement...' : 'Brouillon enregistré'}</span>
@@ -25,8 +28,39 @@ export default function StepperHeader({ currentStep, reference, isSaving }) {
         )}
       </div>
 
-      <div className="max-w-7xl mx-auto mt-6">
-        <ol className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="max-w-7xl mx-auto mt-4 sm:mt-6">
+        {/* Vue compacte Mobile (< sm) */}
+        <div className="sm:hidden space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-[#0A1931]">
+              Étape {currentStep}/4 : <span className="text-amber-600">{currentStepObj.label}</span>
+            </span>
+            <div className="flex gap-1.5">
+              {STEPS.map((step) => (
+                <span
+                  key={step.id}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    step.id === currentStep
+                      ? 'bg-[#0A1931]'
+                      : step.id < currentStep
+                      ? 'bg-amber-400'
+                      : 'bg-slate-200'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Barre de progression */}
+          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-linear-to-r from-[#0A1931] to-amber-500 transition-all duration-300"
+              style={{ width: `${Math.max(15, progressPercent)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Vue Complète Tablette & Desktop (sm+) */}
+        <ol className="hidden sm:grid sm:grid-cols-2 md:grid-cols-4 gap-3">
           {STEPS.map((step) => {
             const isDone = currentStep > step.id;
             const isCurrent = currentStep === step.id;

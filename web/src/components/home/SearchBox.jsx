@@ -33,14 +33,14 @@ export default function SearchBox() {
   const isSale = form.transaction_type === 'sale';
 
   return (
-    <div className="mt-8 bg-white rounded-2xl p-4 sm:p-6 text-slate-800 shadow-2xl border border-slate-100 max-w-4xl mx-auto text-left">
+    <div className="mt-6 sm:mt-8 bg-white rounded-2xl p-4 sm:p-6 text-slate-800 shadow-2xl border border-slate-100 max-w-4xl mx-auto text-left">
       <div className="flex border-b border-slate-200 pb-3 mb-4 gap-2">
         {TRANSACTIONS.map(({ id, label, icon: Icon }) => (
           <button
             type="button"
             key={id}
             onClick={() => changeTransaction(id)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition ${
+            className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition ${
               form.transaction_type === id ? 'bg-[#0A1931] text-white' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
@@ -50,7 +50,7 @@ export default function SearchBox() {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <SelectField
           id="home-city"
           label="Localisation"
@@ -80,10 +80,10 @@ export default function SearchBox() {
           onChange={setField('max_price')}
         />
 
-        <div className="flex items-end">
+        <div className="flex items-end pt-1 sm:pt-0">
           <button
             type="submit"
-            className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-md"
+            className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 sm:py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md active:scale-98"
           >
             <Search className="w-4 h-4" />
             <span>Rechercher</span>

@@ -11,13 +11,13 @@ export default function HeroBannerCarousel() {
     <section
       aria-roledescription="carousel"
       aria-label="Catégories d'annonces"
-      className="relative w-full h-[360px] sm:h-[440px] md:h-[480px] rounded-3xl overflow-hidden shadow-2xl group border border-slate-700/40"
+      className="relative w-full h-[380px] sm:h-[440px] md:h-[480px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl group border border-slate-700/40"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
     >
-      {/* Images : fondu entre deux slides (sans animation si l'utilisateur l'a demandé) */}
+      {/* Images : fondu entre deux slides */}
       {HERO_SLIDES.map((item, position) => (
         <div
           key={item.id}
@@ -33,7 +33,7 @@ export default function HeroBannerCarousel() {
             fetchPriority={position === 0 ? 'high' : 'auto'}
             className="w-full h-full object-cover object-center brightness-[0.72] contrast-[1.05]"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-[#0A1931]/95 via-[#0A1931]/75 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#0A1931]/95 via-[#0A1931]/80 to-transparent" />
           <div className="absolute inset-0 bg-linear-to-t from-[#0A1931] via-transparent to-black/30" />
         </div>
       ))}
@@ -41,66 +41,66 @@ export default function HeroBannerCarousel() {
       {/* Texte du slide affiché */}
       <div
         aria-live={playing ? 'off' : 'polite'}
-        className="relative z-20 h-full max-w-4xl px-6 sm:px-12 flex flex-col justify-center space-y-4"
+        className="relative z-20 h-full max-w-4xl px-5 sm:px-12 flex flex-col justify-center space-y-3 sm:space-y-4"
       >
-        <span className="self-start inline-flex items-center gap-1.5 bg-[#F5A623] text-slate-950 font-black text-[11px] sm:text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
-          <Sparkles className="w-3.5 h-3.5 fill-current" />
+        <span className="self-start inline-flex items-center gap-1.5 bg-[#F5A623] text-slate-950 font-black text-[10px] sm:text-xs px-2.5 sm:px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
+          <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5 fill-current shrink-0" />
           {slide.tag}
         </span>
 
-        <div className="space-y-1">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight drop-shadow-md">
+        <div className="space-y-0.5 sm:space-y-1">
+          <h2 className="text-xl sm:text-4xl md:text-5xl font-black text-white leading-tight drop-shadow-md">
             {slide.title}
           </h2>
-          <div className="text-xl sm:text-3xl md:text-4xl font-extrabold text-[#F5A623] tracking-wide drop-shadow-sm">
+          <div className="text-lg sm:text-3xl md:text-4xl font-extrabold text-[#F5A623] tracking-wide drop-shadow-sm">
             {slide.highlight}
           </div>
         </div>
 
-        <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">{slide.subtext}</p>
+        <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed line-clamp-2 sm:line-clamp-none">{slide.subtext}</p>
 
-        <div className="pt-2">
+        <div className="pt-1 sm:pt-2">
           <Link
             to={slide.ctaLink}
-            className="inline-flex items-center gap-2.5 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-black text-xs sm:text-sm px-6 py-3.5 rounded-xl shadow-lg hover:shadow-amber-500/30 transition hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-black text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl shadow-lg hover:shadow-amber-500/30 transition hover:-translate-y-0.5 active:scale-98"
           >
             <span>{slide.ctaText}</span>
-            <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+            <ArrowRight className="w-3.5 sm:w-4 h-3.5 sm:h-4 stroke-[2.5]" />
           </Link>
         </div>
       </div>
 
-      {/* Flèches : toujours visibles sur écran tactile, au survol sur ordinateur */}
+      {/* Flèches : visibles sur tactile, ajustées sur les bords */}
       <button
         type="button"
         onClick={prev}
         aria-label="Slide précédent"
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md opacity-90 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
       >
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="w-4 sm:w-5 h-4 sm:h-5" />
       </button>
       <button
         type="button"
         onClick={next}
         aria-label="Slide suivant"
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-30 p-2 sm:p-2.5 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md opacity-90 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
       >
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="w-4 sm:w-5 h-4 sm:h-5" />
       </button>
 
       {/* Pause et indicateurs */}
-      <div className="absolute bottom-5 right-6 sm:right-12 z-30 flex items-center gap-3">
+      <div className="absolute bottom-4 sm:bottom-5 right-4 sm:right-12 z-30 flex items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={togglePause}
           aria-pressed={userPaused}
           aria-label={userPaused ? 'Reprendre le défilement' : 'Mettre le défilement en pause'}
-          className="p-1.5 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md transition"
+          className="p-1 sm:p-1.5 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md transition"
         >
-          {userPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
+          {userPaused ? <Play className="w-3 sm:w-3.5 h-3 sm:h-3.5" /> : <Pause className="w-3 sm:w-3.5 h-3 sm:h-3.5" />}
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {HERO_SLIDES.map((item, position) => (
             <button
               type="button"
@@ -109,7 +109,7 @@ export default function HeroBannerCarousel() {
               aria-label={`Aller à : ${item.title}`}
               aria-current={position === index}
               className={`transition-all duration-300 rounded-full ${
-                position === index ? 'w-8 h-2 bg-[#F5A623]' : 'w-2 h-2 bg-white/40 hover:bg-white/70'
+                position === index ? 'w-6 sm:w-8 h-1.5 sm:h-2 bg-[#F5A623]' : 'w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white/40 hover:bg-white/70'
               }`}
             />
           ))}

@@ -12,7 +12,7 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
     property.status === 'rejected' || property.status === 'suspended' ? property.rejection_reason : null;
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-between gap-4">
+    <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 flex flex-col justify-between gap-4 shadow-xs">
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-mono font-bold text-slate-400">Réf : {property.reference}</span>
@@ -37,7 +37,7 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t border-slate-100 text-xs">
         <div className="flex items-center gap-3 text-slate-500">
           <span className="flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" /> {property.views_count || 0} vues
@@ -51,19 +51,19 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
           {editable && (
             <Link
               to={`/deposer/${property.reference}`}
-              className="text-[#0A1931] font-semibold hover:underline flex items-center gap-1"
+              className="text-[#0A1931] font-semibold hover:underline flex items-center gap-1 py-1"
             >
-              <Edit3 className="w-3 h-3" />
+              <Edit3 className="w-3.5 h-3.5" />
               <span>{property.status === 'rejected' ? 'Corriger' : 'Reprendre'}</span>
             </Link>
           )}
           {property.status === 'published' && (
             <Link
               to={`/properties/${property.reference}`}
-              className="text-amber-600 font-semibold hover:underline flex items-center gap-1"
+              className="text-amber-600 font-semibold hover:underline flex items-center gap-1 py-1"
             >
               <span>Voir</span>
-              <ExternalLink className="w-3 h-3" />
+              <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           )}
           {editable && (
@@ -71,9 +71,9 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
               type="button"
               onClick={() => onDelete(property)}
               disabled={busy}
-              className="text-rose-600 font-semibold hover:underline flex items-center gap-1 disabled:opacity-50"
+              className="text-rose-600 font-semibold hover:underline flex items-center gap-1 disabled:opacity-50 py-1"
             >
-              <Trash2 className="w-3 h-3" />
+              <Trash2 className="w-3.5 h-3.5" />
               <span>Supprimer</span>
             </button>
           )}

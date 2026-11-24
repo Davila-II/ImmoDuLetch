@@ -53,13 +53,13 @@ export default function EstimationForm() {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full bg-[#25D366] hover:bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-sm transition flex items-center justify-center gap-2"
+          className="w-full bg-[#25D366] hover:bg-emerald-600 text-white font-bold py-3 sm:py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2"
         >
           <MessageSquare className="w-4 h-4" />
           <span>Ouvrir WhatsApp</span>
         </a>
 
-        <div className="flex gap-4 text-xs">
+        <div className="flex flex-wrap gap-4 text-xs pt-1">
           <button type="button" onClick={() => setWhatsappUrl(null)} className="text-slate-500 underline hover:text-slate-700">
             Modifier ma demande
           </button>
@@ -98,7 +98,7 @@ export default function EstimationForm() {
         onChange={setField('location')}
       />
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <SelectField
           id="estimation-type"
           label="Type de bien"
@@ -118,7 +118,7 @@ export default function EstimationForm() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <TextField
           id="estimation-name"
           label="Votre nom"
@@ -144,7 +144,7 @@ export default function EstimationForm() {
       <button
         type="submit"
         disabled={!isConfigured}
-        className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-sm transition mt-2 flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 sm:py-2.5 rounded-xl text-sm transition mt-2 flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <MessageSquare className="w-4 h-4" />
         <span>Envoyer ma demande par WhatsApp</span>
