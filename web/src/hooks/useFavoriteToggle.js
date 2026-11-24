@@ -1,62 +1,46 @@
-import { useState, useCallback, useEffect } from 'react';
-import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { useCallback, useState } from 'react';
+import { propertyService } from '../services/propertyService';
+import { useAuth } from './useAuth';
 
-/**
- * useFavoriteToggle
- * Hook SRP qui encapsule toute la logique de gestion des favoris.
- *
- * Retourne :
- *   isFav          — état favori courant
- *   loadingFav     — requête en cours
- *   showLoginHint  — doit-on afficher le toast de connexion ?
- *   toggle         — handler à brancher sur onClick
- *   dismissHint    — masque le toast
- */
 export function useFavoriteToggle(property) {
   const { user } = useAuth();
-  const [isFav, setIsFav] = useState(property?.is_favorite ?? false);
+  const reference = property?.reference;
+  // Valeur envoyée par l'API (présente seulement pour un utilisateur connecté)
+  const serverValue = Boolean(property?.is_favorite);
+
+  // Valeur choisie par l'utilisateur, valable tant que l'API ne renvoie pas autre chose
+  const [override, setOverride] = useState(null);
+  const isFav =
+    override && override.reference === reference && override.base === serverValue ? override.value : serverValue;
+
   const [loadingFav, setLoadingFav] = useState(false);
   const [showLoginHint, setShowLoginHint] = useState(false);
 
-  // Synchroniser quand la prop change (ex: chargement asynchrone sur fiche détail)
-  useEffect(() => {
-    if (property?.is_favorite !== undefined) {
-      setIsFav(Boolean(property.is_favorite));
-    }
-  }, [property?.is_favorite]);
-
   const toggle = useCallback(
-    async (e) => {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+    async (event) => {
+      event?.preventDefault();
+      event?.stopPropagation();
 
-      // Visiteur non-connecté → afficher le toast, ne pas appeler l'API
       if (!user) {
         setShowLoginHint(true);
-        return;
+        return null;
       }
+      if (!reference) return null;
 
-      if (!property?.reference) return;
-
+      const next = !isFav;
       setLoadingFav(true);
       try {
-        if (isFav) {
-          await api.delete(`/properties/${property.reference}/favorite`);
-          setIsFav(false);
-        } else {
-          await api.put(`/properties/${property.reference}/favorite`);
-          setIsFav(true);
-        }
+        await propertyService.setFavorite(reference, next);
+        setOverride({ reference, base: serverValue, value: next });
+        return next;
       } catch (err) {
-        console.error('Erreur favori:', err);
+        console.error('Erreur favori :', err);
+        return null;
       } finally {
         setLoadingFav(false);
       }
     },
-    [user, isFav, property?.reference],
+    [user, reference, isFav, serverValue]
   );
 
   const dismissHint = useCallback(() => setShowLoginHint(false), []);

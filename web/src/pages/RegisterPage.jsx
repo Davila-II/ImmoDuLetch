@@ -1,154 +1,154 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
-import logo from '../assets/immo.png';
+import { useState } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import AuthCard from '../components/auth/AuthCard';
+import Alert from '../components/ui/Alert';
+import TextField from '../components/ui/TextField';
+import { useAuth } from '../hooks/useAuth';
+import { useFormSubmit } from '../hooks/useFormSubmit';
+import { normalizePhone } from '../utils/phone';
+
+// Les comptes agence sont créés par l'équipe : ils ne sont pas proposés à l'inscription
+const ACCOUNT_TYPES = [
+  { id: 'particulier', label: 'Particulier' },
+  { id: 'independant', label: 'Indépendant' },
+];
 
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
+  const { user, register } = useAuth();
+
+  const [form, setForm] = useState({
+    account_type: 'particulier',
     name: '',
     email: '',
     phone: '',
     password: '',
     password_confirmation: '',
-    user_type: 'particular',
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { setUser } = useAuth();
-  const navigate = useNavigate();
+  const setField = (field) => (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.post('/auth/register', formData);
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
-      setUser(user);
-      navigate('/my-account');
-    } catch (err) {
-      console.error(err);
-      setError("Erreur lors de l'inscription. Vérifiez les champs saisis.");
-    } finally {
-      setLoading(false);
-    }
+  const { submit, loading, error, fieldErrors } = useFormSubmit(
+    () =>
+      register({
+        ...form,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: normalizePhone(form.phone),
+      }),
+    { fallback: 'Impossible de créer le compte. Réessayez.' }
+  );
+
+  if (user) return <Navigate to="/my-account" replace />;
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    submit();
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 shadow-xl p-8 space-y-6">
-        <div className="text-center space-y-2">
-          <img src={logo} alt="Immo du Letch" className="h-14 mx-auto object-contain" />
-          <h2 className="text-xl font-extrabold text-[#0A1931]">Créer un compte certifié</h2>
-          <p className="text-xs text-slate-500">Rejoignez le réseau immobilier de référence au Cameroun</p>
-        </div>
-
-        {error && (
-          <div className="bg-rose-50 text-rose-700 text-xs p-3 rounded-lg border border-rose-200">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Type de compte</label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'particular', label: 'Particulier' },
-                { id: 'agent', label: 'Indépendant' },
-                { id: 'agency', label: 'Agence' },
-              ].map(t => (
-                <button
-                  type="button"
-                  key={t.id}
-                  onClick={() => setFormData({ ...formData, user_type: t.id })}
-                  className={`py-1.5 rounded-lg border text-center font-medium ${
-                    formData.user_type === t.id
-                      ? 'bg-[#0A1931] text-white border-[#0A1931]'
-                      : 'border-slate-200 text-slate-600'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Nom complet ou Raison sociale</label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Adresse Email</label>
-            <input
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Numéro de Téléphone (Cameroun / Intl)</label>
-            <input
-              type="tel"
-              required
-              placeholder="+237 6..."
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">Mot de passe</label>
-              <input
-                type="password"
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50"
-              />
-            </div>
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">Confirmation</label>
-              <input
-                type="password"
-                required
-                value={formData.password_confirmation}
-                onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
-                className="w-full p-2 border border-slate-200 rounded-lg bg-slate-50"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-sm transition shadow-sm"
-          >
-            {loading ? "Création du compte..." : "Créer mon compte"}
-          </button>
-        </form>
-
-        <div className="text-center text-xs text-slate-500 pt-2 border-t border-slate-100">
+    <AuthCard
+      title="Créer un compte"
+      subtitle="Rejoignez la plateforme immobilière Immo du Letch"
+      footer={
+        <>
           <span>Vous avez déjà un compte ? </span>
           <Link to="/login" className="text-amber-600 font-semibold hover:underline">
             Se connecter
           </Link>
+        </>
+      }
+    >
+      {error && <Alert>{error}</Alert>}
+
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        <div>
+          <span className="block font-semibold text-slate-700 mb-1">Type de compte</span>
+          <div className="grid grid-cols-2 gap-2">
+            {ACCOUNT_TYPES.map((type) => (
+              <button
+                type="button"
+                key={type.id}
+                onClick={() => setForm((prev) => ({ ...prev, account_type: type.id }))}
+                className={`py-1.5 rounded-lg border text-center font-medium ${
+                  form.account_type === type.id
+                    ? 'bg-[#0A1931] text-white border-[#0A1931]'
+                    : 'border-slate-200 text-slate-600'
+                }`}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Vous êtes une agence ? Contactez-nous : les comptes agence sont créés par notre équipe.
+          </p>
         </div>
-      </div>
-    </div>
+
+        <TextField
+          id="name"
+          label="Nom complet"
+          type="text"
+          required
+          autoComplete="name"
+          value={form.name}
+          onChange={setField('name')}
+          error={fieldErrors.name}
+        />
+
+        <TextField
+          id="email"
+          label="Adresse email"
+          type="email"
+          required
+          autoComplete="email"
+          value={form.email}
+          onChange={setField('email')}
+          error={fieldErrors.email}
+        />
+
+        <TextField
+          id="phone"
+          label="Numéro de téléphone"
+          type="tel"
+          required
+          autoComplete="tel"
+          placeholder="+237 6..."
+          value={form.phone}
+          onChange={setField('phone')}
+          error={fieldErrors.phone}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <TextField
+            id="password"
+            label="Mot de passe"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            value={form.password}
+            onChange={setField('password')}
+            error={fieldErrors.password}
+          />
+          <TextField
+            id="password_confirmation"
+            label="Confirmation"
+            type="password"
+            required
+            autoComplete="new-password"
+            value={form.password_confirmation}
+            onChange={setField('password_confirmation')}
+          />
+        </div>
+        <p className="text-[11px] text-slate-400 -mt-2">8 caractères minimum.</p>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-sm transition shadow-sm disabled:opacity-60"
+        >
+          {loading ? 'Création du compte...' : 'Créer mon compte'}
+        </button>
+      </form>
+    </AuthCard>
   );
 }
