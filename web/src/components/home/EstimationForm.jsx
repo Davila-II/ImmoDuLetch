@@ -7,6 +7,7 @@ import { ESTIMATION_ASSET_TYPES } from '../../constants/siteContent';
 import { platformWhatsAppLink } from '../../utils/contact';
 import { buildEstimationMessage } from '../../utils/estimation';
 import { normalizePhone } from '../../utils/phone';
+import { useLanguage } from '../../context/LanguageContext';
 
 const EMPTY_FORM = {
   location: '',
@@ -17,6 +18,7 @@ const EMPTY_FORM = {
 };
 
 export default function EstimationForm() {
+  const { t } = useLanguage();
   const [form, setForm] = useState(EMPTY_FORM);
   const [whatsappUrl, setWhatsappUrl] = useState(null);
 
@@ -56,12 +58,12 @@ export default function EstimationForm() {
           className="w-full bg-[#25D366] hover:bg-emerald-600 text-white font-bold py-3 sm:py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2"
         >
           <MessageSquare className="w-4 h-4" />
-          <span>Ouvrir WhatsApp</span>
+          <span>{t('estimation.openWhatsApp', null, 'Ouvrir WhatsApp')}</span>
         </a>
 
         <div className="flex flex-wrap gap-4 text-xs pt-1">
           <button type="button" onClick={() => setWhatsappUrl(null)} className="text-slate-500 underline hover:text-slate-700">
-            Modifier ma demande
+            {t('estimation.modifyRequest', null, 'Modifier ma demande')}
           </button>
           <button
             type="button"
@@ -71,7 +73,7 @@ export default function EstimationForm() {
             }}
             className="text-slate-500 underline hover:text-slate-700"
           >
-            Estimer un autre bien
+            {t('estimation.estimateAnother', null, 'Estimer un autre bien')}
           </button>
         </div>
       </div>
@@ -89,11 +91,11 @@ export default function EstimationForm() {
 
       <TextField
         id="estimation-location"
-        label="Localisation du bien"
+        label={t('estimation.locationLabel', null, 'Localisation du bien')}
         type="text"
         required
         maxLength={150}
-        placeholder="Ex : Douala, Bonapriso ou Yaoundé, Bastos"
+        placeholder={t('estimation.locationPlaceholder', null, 'Ex : Douala, Bonapriso ou Yaoundé, Bastos')}
         value={form.location}
         onChange={setField('location')}
       />
@@ -101,14 +103,14 @@ export default function EstimationForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <SelectField
           id="estimation-type"
-          label="Type de bien"
+          label={t('estimation.typeLabel', null, 'Type de bien')}
           options={ESTIMATION_ASSET_TYPES}
           value={form.assetType}
           onChange={setField('assetType')}
         />
         <TextField
           id="estimation-area"
-          label="Superficie (m²)"
+          label={t('estimation.areaLabel', null, 'Superficie (m²)')}
           type="text"
           inputMode="numeric"
           maxLength={9}
@@ -121,17 +123,17 @@ export default function EstimationForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <TextField
           id="estimation-name"
-          label="Votre nom"
+          label={t('estimation.nameLabel', null, 'Votre nom')}
           type="text"
           required
           autoComplete="name"
-          placeholder="Nom complet"
+          placeholder={t('estimation.namePlaceholder', null, 'Nom complet')}
           value={form.name}
           onChange={setField('name')}
         />
         <TextField
           id="estimation-phone"
-          label="Téléphone / WhatsApp"
+          label={t('estimation.phoneLabel', null, 'Téléphone / WhatsApp')}
           type="tel"
           required
           autoComplete="tel"
@@ -147,7 +149,7 @@ export default function EstimationForm() {
         className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 sm:py-2.5 rounded-xl text-sm transition mt-2 flex items-center justify-center gap-2 shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <MessageSquare className="w-4 h-4" />
-        <span>Envoyer ma demande par WhatsApp</span>
+        <span>{t('estimation.submitButton', null, 'Envoyer ma demande par WhatsApp')}</span>
       </button>
     </form>
   );

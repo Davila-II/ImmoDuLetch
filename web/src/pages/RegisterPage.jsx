@@ -6,15 +6,16 @@ import TextField from '../components/ui/TextField';
 import { useAuth } from '../hooks/useAuth';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { normalizePhone } from '../utils/phone';
-
-// Les comptes agence sont créés par l'équipe : ils ne sont pas proposés à l'inscription
-const ACCOUNT_TYPES = [
-  { id: 'particulier', label: 'Particulier' },
-  { id: 'independant', label: 'Indépendant' },
-];
+import { useLanguage } from '../context/LanguageContext';
 
 export default function RegisterPage() {
+  const { t } = useLanguage();
   const { user, register } = useAuth();
+
+  const accountTypes = [
+    { id: 'particulier', label: t('auth.individual', null, 'Particulier') },
+    { id: 'independant', label: t('auth.independent', null, 'Indépendant') },
+  ];
 
   const [form, setForm] = useState({
     account_type: 'particulier',
@@ -46,13 +47,13 @@ export default function RegisterPage() {
 
   return (
     <AuthCard
-      title="Créer un compte"
-      subtitle="Rejoignez la plateforme immobilière Immo du Letch"
+      title={t('auth.registerTitle', null, 'Créer un compte')}
+      subtitle={t('auth.registerSubtitle', null, 'Rejoignez la plateforme immobilière Immo du Letch')}
       footer={
         <>
-          <span>Vous avez déjà un compte ? </span>
+          <span>{t('auth.haveAccount', null, 'Vous avez déjà un compte ?')} </span>
           <Link to="/login" className="text-amber-600 font-semibold hover:underline">
-            Se connecter
+            {t('favorites.loginButton', null, 'Se connecter')}
           </Link>
         </>
       }
@@ -61,9 +62,9 @@ export default function RegisterPage() {
 
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         <div>
-          <span className="block font-semibold text-slate-700 mb-1">Type de compte</span>
+          <span className="block font-semibold text-slate-700 mb-1">{t('auth.accountTypeLabel', null, 'Type de compte')}</span>
           <div className="grid grid-cols-2 gap-2">
-            {ACCOUNT_TYPES.map((type) => (
+            {accountTypes.map((type) => (
               <button
                 type="button"
                 key={type.id}
@@ -79,13 +80,13 @@ export default function RegisterPage() {
             ))}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">
-            Vous êtes une agence ? Contactez-nous : les comptes agence sont créés par notre équipe.
+            {t('auth.agencyNotice', null, 'Vous êtes une agence ? Contactez-nous : les comptes agence sont créés par notre équipe.')}
           </p>
         </div>
 
         <TextField
           id="name"
-          label="Nom complet"
+          label={t('auth.fullNameLabel', null, 'Nom complet')}
           type="text"
           required
           autoComplete="name"
@@ -96,7 +97,7 @@ export default function RegisterPage() {
 
         <TextField
           id="email"
-          label="Adresse email"
+          label={t('auth.emailLabel', null, 'Adresse email')}
           type="email"
           required
           autoComplete="email"
@@ -107,7 +108,7 @@ export default function RegisterPage() {
 
         <TextField
           id="phone"
-          label="Numéro de téléphone"
+          label={t('auth.phoneLabel', null, 'Numéro de téléphone / WhatsApp')}
           type="tel"
           required
           autoComplete="tel"
@@ -120,7 +121,7 @@ export default function RegisterPage() {
         <div className="grid grid-cols-2 gap-3">
           <TextField
             id="password"
-            label="Mot de passe"
+            label={t('auth.passwordLabel', null, 'Mot de passe')}
             type="password"
             required
             minLength={8}
@@ -131,7 +132,7 @@ export default function RegisterPage() {
           />
           <TextField
             id="password_confirmation"
-            label="Confirmation"
+            label={t('auth.passwordConfirmationLabel', null, 'Confirmation')}
             type="password"
             required
             autoComplete="new-password"
@@ -146,7 +147,7 @@ export default function RegisterPage() {
           disabled={loading}
           className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2.5 rounded-lg text-sm transition shadow-sm disabled:opacity-60"
         >
-          {loading ? 'Création du compte...' : 'Créer mon compte'}
+          {loading ? 'Création...' : t('auth.registerSubmit', null, 'Créer mon compte')}
         </button>
       </form>
     </AuthCard>

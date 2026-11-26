@@ -10,6 +10,7 @@ import { usePaginatedResource } from '../hooks/usePaginatedResource';
 import { inquiryService } from '../services/inquiryService';
 import { propertyService } from '../services/propertyService';
 import { formatNumber } from '../utils/format';
+import { useLanguage } from '../context/LanguageContext';
 
 const NO_STATS = { total: 0, views: 0, contacts: 0 };
 
@@ -31,6 +32,7 @@ function LoadMore({ show, loading, onClick, label }) {
 }
 
 export default function AccountDashboardPage() {
+  const { t } = useLanguage();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -91,15 +93,15 @@ export default function AccountDashboardPage() {
   };
 
   const tabs = [
-    { id: 'properties', label: `Mes annonces (${stats.total})` },
-    { id: 'inquiries', label: `Demandes reçues${newCount > 0 ? ` (${newCount} nouvelles)` : ''}` },
+    { id: 'properties', label: `${t('dashboard.myProperties', null, 'Mes annonces')} (${stats.total})` },
+    { id: 'inquiries', label: `${t('dashboard.inquiriesReceived', null, 'Demandes reçues')}${newCount > 0 ? ` (${t('dashboard.newInquiries', { count: newCount }, `${newCount} nouvelles`)})` : ''}` },
   ];
 
   const summary = [
-    { label: 'Mes annonces', value: stats.total },
-    { label: 'Vues totales', value: formatNumber(stats.views) },
-    { label: 'Contacts reçus', value: stats.contacts },
-    { label: 'Demandes non lues', value: newCount },
+    { label: t('dashboard.myProperties', null, 'Mes annonces'), value: stats.total },
+    { label: t('dashboard.totalViews', null, 'Vues totales'), value: formatNumber(stats.views) },
+    { label: t('dashboard.contactsReceived', null, 'Contacts reçus'), value: stats.contacts },
+    { label: t('dashboard.unreadInquiries', null, 'Demandes non lues'), value: newCount },
   ];
 
   return (
@@ -113,7 +115,7 @@ export default function AccountDashboardPage() {
             {loadError}
           </span>
           <button type="button" onClick={reloadAll} className="font-bold underline shrink-0">
-            Réessayer
+            {t('catalog.clear', null, 'Réessayer')}
           </button>
         </Alert>
       )}
@@ -147,7 +149,7 @@ export default function AccountDashboardPage() {
 
       {activeTab === 'properties' && (
         <div className="space-y-4">
-          {loading && <p className="text-xs text-slate-500">Chargement de vos annonces…</p>}
+          {loading && <p className="text-xs text-slate-500">Chargement…</p>}
 
           {properties.items.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -166,15 +168,15 @@ export default function AccountDashboardPage() {
             show={properties.hasMore}
             loading={properties.loadingMore}
             onClick={properties.loadMore}
-            label="Voir plus d'annonces"
+            label={t('catalog.loadMore', null, "Voir plus d'annonces")}
           />
 
           {!loading && !loadError && properties.items.length === 0 && (
             <div className="bg-white p-8 rounded-xl border border-slate-200 text-center space-y-3">
               <Building className="w-10 h-10 text-slate-300 mx-auto" />
-              <p className="text-slate-600 text-sm font-semibold">Vous n'avez pas encore d'annonce.</p>
+              <p className="text-slate-600 text-sm font-semibold">{t('dashboard.noProperties', null, "Vous n'avez pas encore d'annonce.")}</p>
               <Link to="/deposer" className="inline-block bg-[#F5A623] text-slate-950 font-bold px-4 py-2 rounded-lg text-xs">
-                Déposer mon premier bien
+                {t('dashboard.depositFirst', null, 'Déposer mon premier bien')}
               </Link>
             </div>
           )}
@@ -183,7 +185,7 @@ export default function AccountDashboardPage() {
 
       {activeTab === 'inquiries' && (
         <div className="space-y-4">
-          {loading && <p className="text-xs text-slate-500">Chargement des demandes…</p>}
+          {loading && <p className="text-xs text-slate-500">Chargement…</p>}
 
           {inquiries.items.length > 0 && (
             <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
@@ -207,7 +209,7 @@ export default function AccountDashboardPage() {
 
           {!loading && !loadError && inquiries.items.length === 0 && (
             <div className="bg-white p-8 rounded-xl border border-slate-200 text-center text-slate-500 text-xs">
-              Aucune demande reçue pour l'instant.
+              {t('dashboard.noInquiries', null, "Aucune demande reçue pour l'instant.")}
             </div>
           )}
         </div>

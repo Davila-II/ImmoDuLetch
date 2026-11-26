@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useFormSubmit } from '../../hooks/useFormSubmit';
 import { inquiryService } from '../../services/inquiryService';
 import { normalizePhone } from '../../utils/phone';
+import { useLanguage } from '../../context/LanguageContext';
 
 function buildPayload(type, form) {
   const payload = { type, name: form.name.trim() };
@@ -19,6 +20,7 @@ function buildPayload(type, form) {
 }
 
 function InquiryFormBody({ reference, user }) {
+  const { t } = useLanguage();
   const [type, setType] = useState('contact');
   const [form, setForm] = useState({
     name: user?.name ?? '',
@@ -57,7 +59,7 @@ function InquiryFormBody({ reference, user }) {
     return (
       <div className="space-y-3">
         <Alert tone="success">
-          Votre demande a bien été envoyée. Le propriétaire vous recontactera.
+          {t('detail.inquirySuccess', null, 'Votre demande a bien été envoyée. Le propriétaire vous recontactera.')}
         </Alert>
         <button type="button" onClick={() => setSent(false)} className="text-xs font-semibold text-[#0A1931] hover:underline">
           Envoyer une autre demande
@@ -70,8 +72,8 @@ function InquiryFormBody({ reference, user }) {
     <form onSubmit={handleSubmit} className="space-y-3 text-xs">
       <div className="flex gap-2">
         {[
-          { id: 'contact', label: 'Poser une question' },
-          { id: 'visit', label: 'Demander une visite' },
+          { id: 'contact', label: t('detail.tabQuestion', null, 'Poser une question') },
+          { id: 'visit', label: t('detail.tabVisit', null, 'Demander une visite') },
         ].map((option) => (
           <button
             type="button"
@@ -90,7 +92,7 @@ function InquiryFormBody({ reference, user }) {
 
       <TextField
         id="inquiry-name"
-        label="Votre nom"
+        label={t('estimation.nameLabel', null, 'Votre nom')}
         type="text"
         required
         autoComplete="name"
@@ -100,7 +102,7 @@ function InquiryFormBody({ reference, user }) {
       />
       <TextField
         id="inquiry-phone"
-        label="Téléphone"
+        label={t('estimation.phoneLabel', null, 'Téléphone')}
         type="tel"
         required
         autoComplete="tel"
@@ -122,7 +124,7 @@ function InquiryFormBody({ reference, user }) {
       {type === 'visit' && (
         <TextField
           id="inquiry-visit"
-          label="Date et heure souhaitées"
+          label={t('detail.desiredDate', null, 'Date et heure souhaitées')}
           type="datetime-local"
           required
           value={form.visitAt}
@@ -133,7 +135,7 @@ function InquiryFormBody({ reference, user }) {
 
       <div>
         <label htmlFor="inquiry-message" className="block font-semibold text-slate-700 mb-1">
-          Message (facultatif)
+          {t('detail.yourMessage', null, 'Message (facultatif)')}
         </label>
         <textarea
           id="inquiry-message"
@@ -150,7 +152,7 @@ function InquiryFormBody({ reference, user }) {
         disabled={loading}
         className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-2 rounded-lg text-xs transition disabled:opacity-60"
       >
-        {loading ? 'Envoi...' : 'Envoyer ma demande'}
+        {loading ? 'Envoi...' : t('detail.sendInquiry', null, 'Envoyer ma demande')}
       </button>
     </form>
   );

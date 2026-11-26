@@ -2,16 +2,25 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Heart, LogOut, Menu, PlusCircle, ShieldCheck, User, X } from 'lucide-react';
 import logo from '../assets/immo.png';
-import { NAV_LINKS } from '../constants/navigation';
-import { TOP_BANNER } from '../constants/siteContent';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitcher from './ui/LanguageSwitcher';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
   const isAdmin = user?.role === 'admin';
+
+  const navLinks = [
+    { to: '/', label: t('nav.home') },
+    { to: '/properties?transaction_type=sale', label: t('nav.buy') },
+    { to: '/properties?transaction_type=rent', label: t('nav.rent') },
+    { to: '/properties', label: t('nav.allProperties') },
+    { to: '/#estimation', label: t('nav.estimation') },
+  ];
 
   // Fermer automatiquement le menu mobile lors d'un changement de page
   useEffect(() => {
@@ -40,13 +49,12 @@ export default function Navbar() {
           <div className="flex items-center gap-4 lg:gap-6">
             <span className="flex items-center gap-1.5 font-medium text-amber-400">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              {TOP_BANNER.highlight}
+              {t('nav.bannerHighlight')}
             </span>
-            {TOP_BANNER.points.map((point) => (
-              <span key={point} className="hidden lg:inline">• {point}</span>
-            ))}
+            <span className="hidden lg:inline">• {t('nav.bannerPoint1')}</span>
+            <span className="hidden lg:inline">• {t('nav.bannerPoint2')}</span>
           </div>
-          <span className="text-slate-400">{TOP_BANNER.cities}</span>
+          <span className="text-slate-400">{t('nav.bannerCities')}</span>
         </div>
       </div>
 
@@ -59,9 +67,9 @@ export default function Navbar() {
           </Link>
 
           {/* Liens Desktop */}
-          <nav className="hidden lg:flex items-center gap-6 xl:gap-8 font-medium text-slate-700 text-sm">
-            {NAV_LINKS.map((link) => (
-              <Link key={link.label} to={link.to} className="hover:text-[#0A1931] transition">
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-7 font-medium text-slate-700 text-sm">
+            {navLinks.map((link) => (
+              <Link key={link.to} to={link.to} className="hover:text-[#0A1931] transition">
                 {link.label}
               </Link>
             ))}
@@ -71,19 +79,24 @@ export default function Navbar() {
                 className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 bg-indigo-50 px-2.5 py-1 rounded-lg transition"
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Admin</span>
+                <span>{t('nav.admin')}</span>
               </Link>
             )}
           </nav>
 
           {/* Actions Droite */}
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Sélecteur de Langue Desktop */}
+            <div className="hidden sm:block">
+              <LanguageSwitcher variant="navbar" />
+            </div>
+
             {/* Bouton Favoris */}
             <Link
               to="/favorites"
               className="p-2 sm:p-2.5 text-slate-600 hover:text-rose-500 hover:bg-slate-100 rounded-full transition"
-              title="Mes favoris"
-              aria-label="Mes favoris"
+              title={t('nav.favorites')}
+              aria-label={t('nav.favorites')}
             >
               <Heart className="w-5 h-5" />
             </Link>
@@ -94,7 +107,7 @@ export default function Navbar() {
               className="hidden sm:flex items-center gap-2 px-3 py-2 text-slate-700 hover:bg-slate-100 rounded-lg text-sm font-medium transition"
             >
               <User className="w-4 h-4 text-slate-500" />
-              <span>{user ? user.name?.split(' ')[0] : 'Mon espace'}</span>
+              <span>{user ? user.name?.split(' ')[0] : t('nav.myAccount')}</span>
             </Link>
 
             {/* Bouton Déposer une annonce */}
@@ -103,8 +116,7 @@ export default function Navbar() {
               className="flex items-center gap-1.5 sm:gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold shadow-xs transition"
             >
               <PlusCircle className="w-4 h-4 shrink-0" />
-              <span className="hidden xs:inline sm:inline">Déposer</span>
-              <span className="hidden sm:inline">une annonce</span>
+              <span className="hidden xs:inline sm:inline">{t('nav.deposit')}</span>
             </Link>
 
             {/* Hamburger menu mobile */}
@@ -125,13 +137,16 @@ export default function Navbar() {
       {menuOpen && (
         <div className="lg:hidden fixed inset-x-0 top-16 sm:top-20 bottom-0 bg-slate-900/40 backdrop-blur-xs z-50 flex flex-col justify-between">
           <nav className="bg-white border-t border-slate-200 px-5 py-6 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto shadow-2xl">
+            {/* Sélecteur de langue mobile */}
+            <LanguageSwitcher variant="drawer" />
+
             <div className="space-y-1">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
                 Navigation
               </span>
-              {NAV_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <Link
-                  key={link.label}
+                  key={link.to}
                   to={link.to}
                   onClick={closeMenu}
                   className="block px-3 py-2.5 rounded-xl text-base font-semibold text-slate-800 hover:bg-slate-100 active:bg-slate-200 transition"
@@ -147,7 +162,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-base font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition"
                 >
                   <ShieldCheck className="w-5 h-5 text-indigo-600" />
-                  <span>Panneau d'administration</span>
+                  <span>{t('nav.adminPanel')}</span>
                 </Link>
               )}
             </div>
@@ -156,7 +171,7 @@ export default function Navbar() {
 
             <div className="space-y-2">
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
-                Mon Espace Immo
+                {t('nav.mySpace')}
               </span>
 
               <Link
@@ -165,7 +180,7 @@ export default function Navbar() {
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-rose-50 hover:text-rose-600 transition"
               >
                 <Heart className="w-5 h-5 text-rose-500" />
-                <span>Mes Biens Favoris</span>
+                <span>{t('nav.favorites')}</span>
               </Link>
 
               {user ? (
@@ -176,7 +191,7 @@ export default function Navbar() {
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
                   >
                     <User className="w-5 h-5 text-slate-500" />
-                    <span>Mon tableau de bord ({user.name})</span>
+                    <span>{t('nav.dashboard')} ({user.name})</span>
                   </Link>
 
                   <button
@@ -188,7 +203,7 @@ export default function Navbar() {
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition text-left"
                   >
                     <LogOut className="w-5 h-5 text-rose-500" />
-                    <span>Se déconnecter</span>
+                    <span>{t('nav.logout')}</span>
                   </button>
                 </>
               ) : (
@@ -198,14 +213,14 @@ export default function Navbar() {
                     onClick={closeMenu}
                     className="text-center py-2.5 px-3 rounded-xl border border-slate-300 font-bold text-xs text-slate-800 hover:bg-slate-50"
                   >
-                    Connexion
+                    {t('nav.login')}
                   </Link>
                   <Link
                     to="/register"
                     onClick={closeMenu}
                     className="text-center py-2.5 px-3 rounded-xl bg-[#0A1931] text-white font-bold text-xs hover:bg-slate-800"
                   >
-                    Inscription
+                    {t('nav.register')}
                   </Link>
                 </div>
               )}
@@ -220,7 +235,7 @@ export default function Navbar() {
                 className="w-full flex items-center justify-center gap-2 bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 px-4 rounded-xl text-sm shadow-md transition"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Déposer une annonce certifiée</span>
+                <span>{t('nav.deposit')}</span>
               </Link>
             </div>
           </nav>

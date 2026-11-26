@@ -5,20 +5,17 @@ import SelectField from '../ui/SelectField';
 import { getBudgetOptions } from '../../constants/budgets';
 import { CITY_OPTIONS } from '../../constants/cities';
 import { useCatalog } from '../../hooks/useCatalog';
-
-const TRANSACTIONS = [
-  { id: 'sale', label: 'Acheter', icon: Key },
-  { id: 'rent', label: 'Louer', icon: Home },
-];
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function SearchBox() {
   const navigate = useNavigate();
   const { categories } = useCatalog();
+  const { t } = useLanguage();
   const [form, setForm] = useState({ transaction_type: 'sale', city: '', category: '', max_price: '' });
 
   const setField = (field) => (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }));
 
-  // Changer de mode remet le budget à zéro : les tranches ne sont pas les mêmes
+  // Changer de mode remet le budget à zéro
   const changeTransaction = (type) => setForm((prev) => ({ ...prev, transaction_type: type, max_price: '' }));
 
   const handleSubmit = (event) => {
@@ -32,10 +29,15 @@ export default function SearchBox() {
 
   const isSale = form.transaction_type === 'sale';
 
+  const transactions = [
+    { id: 'sale', label: t('hero.buyTab'), icon: Key },
+    { id: 'rent', label: t('hero.rentTab'), icon: Home },
+  ];
+
   return (
     <div className="mt-6 sm:mt-8 bg-white rounded-2xl p-4 sm:p-6 text-slate-800 shadow-2xl border border-slate-100 max-w-4xl mx-auto text-left">
       <div className="flex border-b border-slate-200 pb-3 mb-4 gap-2">
-        {TRANSACTIONS.map(({ id, label, icon: Icon }) => (
+        {transactions.map(({ id, label, icon: Icon }) => (
           <button
             type="button"
             key={id}
@@ -53,9 +55,9 @@ export default function SearchBox() {
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <SelectField
           id="home-city"
-          label="Localisation"
+          label={t('hero.location')}
           icon={MapPin}
-          placeholder="Toutes les villes"
+          placeholder={t('hero.allCities')}
           options={CITY_OPTIONS}
           value={form.city}
           onChange={setField('city')}
@@ -63,9 +65,9 @@ export default function SearchBox() {
 
         <SelectField
           id="home-category"
-          label="Type de bien"
+          label={t('hero.propertyType')}
           icon={Building}
-          placeholder="Tous les types"
+          placeholder={t('hero.allTypes')}
           options={categories.map((category) => ({ value: category.slug, label: category.name }))}
           value={form.category}
           onChange={setField('category')}
@@ -73,8 +75,8 @@ export default function SearchBox() {
 
         <SelectField
           id="home-budget"
-          label={isSale ? 'Budget max (FCFA)' : 'Loyer max / mois (FCFA)'}
-          placeholder="Indifférent"
+          label={isSale ? t('hero.budgetMaxSale') : t('hero.budgetMaxRent')}
+          placeholder={t('hero.anyBudget')}
           options={getBudgetOptions(form.transaction_type)}
           value={form.max_price}
           onChange={setField('max_price')}
@@ -86,7 +88,7 @@ export default function SearchBox() {
             className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 sm:py-2.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition shadow-md active:scale-98"
           >
             <Search className="w-4 h-4" />
-            <span>Rechercher</span>
+            <span>{t('hero.searchButton')}</span>
           </button>
         </div>
       </form>

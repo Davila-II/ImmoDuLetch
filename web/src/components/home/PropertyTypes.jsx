@@ -1,17 +1,20 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import { PROPERTY_TYPE_CARDS, PROPERTY_TYPES_SECTION } from '../../constants/siteContent';
 
 export default function PropertyTypes() {
+  const { t } = useLanguage();
+
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
         <div>
-          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">{PROPERTY_TYPES_SECTION.eyebrow}</span>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">{PROPERTY_TYPES_SECTION.title}</h2>
+          <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">{t('propertyTypes.eyebrow', null, PROPERTY_TYPES_SECTION.eyebrow)}</span>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">{t('propertyTypes.title', null, PROPERTY_TYPES_SECTION.title)}</h2>
         </div>
         <Link to="/properties" className="text-xs sm:text-sm font-semibold text-[#0A1931] hover:text-amber-600 flex items-center gap-1">
-          <span>{PROPERTY_TYPES_SECTION.linkLabel}</span>
+          <span>{t('propertyTypes.seeAll', null, PROPERTY_TYPES_SECTION.linkLabel)}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -31,7 +34,7 @@ export default function PropertyTypes() {
               <p className="text-xs text-slate-500 mb-4 leading-relaxed">{text}</p>
             </div>
             <div className="text-xs font-bold text-[#0A1931] flex items-center gap-1">
-              <span>Voir les annonces</span>
+              <span>{t('propertyTypes.viewListings', null, 'Voir les annonces')}</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>

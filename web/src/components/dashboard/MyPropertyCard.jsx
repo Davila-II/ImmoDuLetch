@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { Edit3, ExternalLink, Eye, MessageSquare, Trash2 } from 'lucide-react';
 import { EDITABLE_STATUSES, PROPERTY_STATUS_BADGES } from '../../constants/statuses';
 import { formatPrice } from '../../utils/format';
+import { useLanguage } from '../../context/LanguageContext';
 
 const UNKNOWN_BADGE = { className: 'bg-slate-50 text-slate-600 border-slate-200' };
 
 export default function MyPropertyCard({ property, busy, onDelete }) {
+  const { t } = useLanguage();
   const badge = PROPERTY_STATUS_BADGES[property.status] ?? { ...UNKNOWN_BADGE, label: property.status };
   const editable = EDITABLE_STATUSES.includes(property.status);
   const reason =
@@ -54,7 +56,7 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
               className="text-[#0A1931] font-semibold hover:underline flex items-center gap-1 py-1"
             >
               <Edit3 className="w-3.5 h-3.5" />
-              <span>{property.status === 'rejected' ? 'Corriger' : 'Reprendre'}</span>
+              <span>{property.status === 'rejected' ? t('dashboard.edit', null, 'Corriger') : t('dashboard.resume', null, 'Reprendre')}</span>
             </Link>
           )}
           {property.status === 'published' && (
@@ -62,7 +64,7 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
               to={`/properties/${property.reference}`}
               className="text-amber-600 font-semibold hover:underline flex items-center gap-1 py-1"
             >
-              <span>Voir</span>
+              <span>{t('dashboard.view', null, 'Voir')}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
           )}
@@ -74,7 +76,7 @@ export default function MyPropertyCard({ property, busy, onDelete }) {
               className="text-rose-600 font-semibold hover:underline flex items-center gap-1 disabled:opacity-50 py-1"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Supprimer</span>
+              <span>{t('dashboard.delete', null, 'Supprimer')}</span>
             </button>
           )}
         </div>

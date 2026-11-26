@@ -4,18 +4,8 @@ import SelectField from '../ui/SelectField';
 import { CITY_OPTIONS } from '../../constants/cities';
 import { LAND_STATUS_LABELS } from '../../constants/landStatus';
 import { useCatalog } from '../../hooks/useCatalog';
+import { useLanguage } from '../../context/LanguageContext';
 
-const TRANSACTIONS = [
-  { value: 'sale', label: 'Acheter' },
-  { value: 'rent', label: 'Louer' },
-];
-const BEDROOM_CHOICES = [
-  { value: '', label: 'Tous' },
-  { value: '1', label: '1' },
-  { value: '2', label: '2' },
-  { value: '3', label: '3' },
-  { value: '4', label: '4+' },
-];
 const LAND_STATUS_OPTIONS = Object.entries(LAND_STATUS_LABELS).map(([value, label]) => ({ value, label }));
 
 const onlyDigits = (value) => value.replace(/\D/g, '');
@@ -23,7 +13,21 @@ const fieldClass = 'w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 
 
 export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = false, onCloseMobile }) {
   const { categories } = useCatalog();
+  const { t } = useLanguage();
   const [draft, setDraft] = useState(initial);
+
+  const transactions = [
+    { value: 'sale', label: t('hero.buyTab') },
+    { value: 'rent', label: t('hero.rentTab') },
+  ];
+
+  const bedroomChoices = [
+    { value: '', label: t('catalog.allBedrooms') },
+    { value: '1', label: '1' },
+    { value: '2', label: '2' },
+    { value: '3', label: '3' },
+    { value: '4', label: '4+' },
+  ];
 
   const setField = (field) => (event) => setDraft((prev) => ({ ...prev, [field]: event.target.value }));
   const setDigits = (field) => (event) => setDraft((prev) => ({ ...prev, [field]: onlyDigits(event.target.value) }));
@@ -44,7 +48,7 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
       <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <span className="font-bold text-slate-900 text-sm flex items-center gap-2">
           <Filter className="w-4 h-4 text-amber-500" />
-          Filtres de recherche
+          {t('catalog.filtersTitle')}
         </span>
         <div className="flex items-center gap-3">
           <button
@@ -53,7 +57,7 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
             className="text-xs text-slate-400 hover:text-slate-700 flex items-center gap-1 transition"
           >
             <RefreshCw className="w-3 h-3" />
-            Effacer
+            {t('catalog.clear')}
           </button>
           {onCloseMobile && (
             <button
@@ -70,9 +74,9 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
 
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         <div>
-          <span className="font-semibold text-slate-700 block mb-1.5">Opération</span>
+          <span className="font-semibold text-slate-700 block mb-1.5">{t('catalog.operation')}</span>
           <div className="grid grid-cols-2 gap-2">
-            {TRANSACTIONS.map(({ value, label }) => (
+            {transactions.map(({ value, label }) => (
               <button
                 type="button"
                 key={value}
@@ -93,8 +97,8 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
 
         <SelectField
           id="filter-city"
-          label="Ville"
-          placeholder="Toutes les villes"
+          label={t('catalog.city')}
+          placeholder={t('hero.allCities')}
           options={CITY_OPTIONS}
           value={draft.city}
           onChange={setField('city')}
@@ -102,8 +106,8 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
 
         <SelectField
           id="filter-category"
-          label="Type de bien"
-          placeholder="Tous les types"
+          label={t('hero.propertyType')}
+          placeholder={t('hero.allTypes')}
           options={categories.map((category) => ({ value: category.slug, label: category.name }))}
           value={draft.category}
           onChange={setField('category')}
@@ -134,9 +138,9 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
         </div>
 
         <div>
-          <span className="font-semibold text-slate-700 block mb-1.5">Chambres minimum</span>
+          <span className="font-semibold text-slate-700 block mb-1.5">{t('catalog.bedroomsMin')}</span>
           <div className="flex gap-1.5">
-            {BEDROOM_CHOICES.map(({ value, label }) => (
+            {bedroomChoices.map(({ value, label }) => (
               <button
                 key={label}
                 type="button"
@@ -155,8 +159,8 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
 
         <SelectField
           id="filter-land-status"
-          label="Statut foncier (déclaré)"
-          placeholder="Tous les statuts"
+          label={t('catalog.landStatus')}
+          placeholder={t('catalog.allStatuses')}
           options={LAND_STATUS_OPTIONS}
           value={draft.land_status}
           onChange={setField('land_status')}
@@ -166,7 +170,7 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
           type="submit"
           className="w-full bg-[#F5A623] hover:bg-[#E29512] text-slate-950 font-bold py-3 sm:py-2.5 rounded-xl sm:rounded-lg text-xs transition shadow-xs"
         >
-          Appliquer les filtres
+          {t('catalog.applyFilters')}
         </button>
       </form>
     </div>
@@ -174,17 +178,13 @@ export default function FilterPanel({ initial, onApply, onReset, isOpenMobile = 
 
   return (
     <>
-      {/* Version Desktop : aside normal */}
       <aside className="hidden lg:block lg:col-span-1 h-fit sticky top-24">
         {panelContent}
       </aside>
 
-      {/* Version Mobile : Drawer / Modal au-dessus du contenu */}
       {isOpenMobile && (
         <div className="lg:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
-          <div
-            className="bg-white w-full max-w-lg max-h-[85vh] sm:rounded-2xl rounded-t-2xl overflow-y-auto p-4 sm:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300"
-          >
+          <div className="bg-white w-full max-w-lg max-h-[85vh] sm:rounded-2xl rounded-t-2xl overflow-y-auto p-4 sm:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
             {panelContent}
           </div>
         </div>

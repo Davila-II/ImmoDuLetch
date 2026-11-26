@@ -7,8 +7,10 @@ import TextField from '../components/ui/TextField';
 import { useAuth } from '../hooks/useAuth';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { normalizeLoginIdentifier } from '../utils/phone';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function LoginPage() {
+  const { t } = useLanguage();
   const { user, login } = useAuth();
   const location = useLocation();
   const redirectTo = location.state?.from || '/my-account';
@@ -31,13 +33,13 @@ export default function LoginPage() {
 
   return (
     <AuthCard
-      title="Espace membre & propriétaire"
-      subtitle="Connectez-vous pour gérer vos annonces et vos demandes"
+      title={t('auth.loginTitle', null, 'Espace membre & propriétaire')}
+      subtitle={t('auth.loginSubtitle', null, 'Connectez-vous pour gérer vos annonces et vos demandes')}
       footer={
         <>
-          <span>Pas encore de compte ? </span>
+          <span>{t('auth.noAccount', null, 'Pas encore de compte ?')} </span>
           <Link to="/register" className="text-amber-600 font-semibold hover:underline">
-            Créer un compte
+            {t('auth.createAccount', null, 'Créer un compte')}
           </Link>
         </>
       }
@@ -47,7 +49,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         <TextField
           id="login"
-          label="Email ou téléphone"
+          label={t('auth.loginIdentifierLabel', null, 'Email ou téléphone')}
           icon={Mail}
           type="text"
           required
@@ -60,7 +62,7 @@ export default function LoginPage() {
 
         <TextField
           id="password"
-          label="Mot de passe"
+          label={t('auth.passwordLabel', null, 'Mot de passe')}
           icon={Lock}
           type="password"
           required
@@ -76,7 +78,7 @@ export default function LoginPage() {
           disabled={loading}
           className="w-full bg-[#0A1931] hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg text-sm transition shadow-sm disabled:opacity-60"
         >
-          {loading ? 'Connexion...' : 'Se connecter'}
+          {loading ? 'Connexion...' : t('auth.loginSubmit', null, 'Se connecter à mon espace')}
         </button>
       </form>
     </AuthCard>

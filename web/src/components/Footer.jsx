@@ -6,11 +6,13 @@ import { COMPANY } from '../constants/company';
 import { LEGAL_LINKS } from '../constants/legal';
 import { PROPERTY_TYPE_CARDS } from '../constants/siteContent';
 import { phoneHref } from '../utils/contact';
+import { useLanguage } from '../context/LanguageContext';
 
 const linkClass = 'hover:text-amber-400 transition';
 const headingClass = 'text-white font-semibold text-sm uppercase tracking-wider mb-4 border-b border-slate-700/60 pb-2';
 
 export default function Footer() {
+  const { t } = useLanguage();
   const hasContact = COMPANY.phone || COMPANY.email || COMPANY.address;
 
   return (
@@ -20,13 +22,12 @@ export default function Footer() {
           <div className="space-y-4">
             <img src={logo} alt={COMPANY.name} className="h-14 w-auto object-contain bg-white/5 p-1 rounded-lg" />
             <p className="text-sm text-slate-400 leading-relaxed">
-              Plateforme immobilière au Cameroun : trouvez, publiez et gérez vos annonces de vente et de location à
-              Douala, Yaoundé et Kribi.
+              {t('footer.tagline')}
             </p>
           </div>
 
           <div>
-            <h4 className={headingClass}>Acheter &amp; louer</h4>
+            <h4 className={headingClass}>{t('footer.buyAndRent')}</h4>
             <ul className="space-y-2.5 text-sm">
               {PROPERTY_TYPE_CARDS.map((card) => (
                 <li key={card.slug}>
@@ -46,26 +47,26 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className={headingClass}>Services</h4>
+            <h4 className={headingClass}>{t('footer.services')}</h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link to="/#estimation" className={linkClass}>
-                  Demander une estimation
+                  {t('footer.estimateRequest')}
                 </Link>
               </li>
               <li>
                 <Link to="/deposer" className={linkClass}>
-                  Déposer une annonce
+                  {t('footer.listProperty')}
                 </Link>
               </li>
               <li>
                 <Link to="/my-account" className={linkClass}>
-                  Mon espace
+                  {t('footer.mySpace')}
                 </Link>
               </li>
               <li>
                 <Link to="/favorites" className={linkClass}>
-                  Mes favoris
+                  {t('footer.myFavorites')}
                 </Link>
               </li>
             </ul>
@@ -73,7 +74,7 @@ export default function Footer() {
 
           {hasContact && (
             <div>
-              <h4 className={headingClass}>Contact</h4>
+              <h4 className={headingClass}>{t('footer.contact')}</h4>
               <ul className="space-y-3 text-sm">
                 {COMPANY.address && (
                   <li className="flex items-start gap-2.5">
@@ -104,7 +105,7 @@ export default function Footer() {
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-4">
           <p>
-            © {new Date().getFullYear()} {COMPANY.name}. Tous droits réservés.
+            © {new Date().getFullYear()} {COMPANY.name}. {t('footer.allRightsReserved')}
           </p>
 
           {LEGAL_LINKS.length > 0 && (

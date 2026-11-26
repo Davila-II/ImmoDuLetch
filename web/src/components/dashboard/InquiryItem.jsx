@@ -1,8 +1,10 @@
 import { Mail, Phone } from 'lucide-react';
 import { INQUIRY_STATUS_BADGES, INQUIRY_TYPES } from '../../constants/statuses';
 import { formatDate, formatDateTime } from '../../utils/format';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function InquiryItem({ inquiry, busy, onStatusChange }) {
+  const { t } = useLanguage();
   const badge = INQUIRY_STATUS_BADGES[inquiry.status] ?? INQUIRY_STATUS_BADGES.new;
 
   return (
@@ -52,7 +54,7 @@ export default function InquiryItem({ inquiry, busy, onStatusChange }) {
             disabled={busy}
             className="font-semibold text-[#0A1931] hover:underline disabled:opacity-50"
           >
-            Marquer comme lu
+            {t('dashboard.markAsRead', null, 'Marquer comme lu')}
           </button>
         )}
         {inquiry.status !== 'handled' && (
@@ -62,7 +64,7 @@ export default function InquiryItem({ inquiry, busy, onStatusChange }) {
             disabled={busy}
             className="font-semibold text-emerald-700 hover:underline disabled:opacity-50"
           >
-            Marquer comme traité
+            {t('dashboard.markAsHandled', null, 'Marquer comme traité')}
           </button>
         )}
       </div>

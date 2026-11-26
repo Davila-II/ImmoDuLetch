@@ -1,6 +1,7 @@
 import { Heart } from 'lucide-react';
 import { useFavoriteToggle } from '../../hooks/useFavoriteToggle';
 import LoginPromptToast from '../LoginPromptToast';
+import { useLanguage } from '../../context/LanguageContext';
 
 const VARIANTS = {
   // Pastille ronde posée sur la photo d'une carte (à positionner avec className)
@@ -18,8 +19,9 @@ const VARIANTS = {
 };
 
 export default function FavoriteButton({ property, variant = 'icon', className = '', onChange }) {
+  const { t } = useLanguage();
   const { isFav, loadingFav, showLoginHint, toggle, dismissHint } = useFavoriteToggle(property);
-  const label = isFav ? 'Retirer des favoris' : 'Ajouter aux favoris';
+  const label = isFav ? t('card.favoriteRemove', null, 'Retirer des favoris') : t('card.favoriteAdd', null, 'Ajouter aux favoris');
 
   const handleClick = async (event) => {
     const next = await toggle(event);
@@ -39,7 +41,7 @@ export default function FavoriteButton({ property, variant = 'icon', className =
         className={`${VARIANTS[variant](isFav)} ${className}`}
       >
         <Heart className={`w-4 h-4 ${isFav ? 'fill-current' : ''}`} />
-        {variant === 'pill' && <span>{isFav ? 'Favori' : 'Enregistrer'}</span>}
+        {variant === 'pill' && <span>{isFav ? t('detail.favorite', null, 'Favori') : t('detail.saveFavorite', null, 'Enregistrer')}</span>}
       </button>
     </>
   );

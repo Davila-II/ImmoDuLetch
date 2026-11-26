@@ -9,8 +9,10 @@ import Step2Details from '../components/submit-form/Step2Details';
 import Step3Media from '../components/submit-form/Step3Media';
 import Step4Pricing from '../components/submit-form/Step4Pricing';
 import LivePreviewCard from '../components/submit-form/LivePreviewCard';
+import { useLanguage } from '../context/LanguageContext';
 
 function SubmitProperty({ initialReference }) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [submittedReference, setSubmittedReference] = useState(null);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
@@ -109,7 +111,7 @@ function SubmitProperty({ initialReference }) {
             className="flex items-center gap-1.5 text-xs font-semibold bg-white border border-slate-200 hover:border-slate-300 text-slate-700 px-3.5 py-2 rounded-xl shadow-xs"
           >
             <Eye className="w-3.5 h-3.5 text-amber-500" />
-            <span>Aperçu de l'annonce</span>
+            <span>{t('submit.previewButton', null, "Aperçu de l'annonce")}</span>
           </button>
         </div>
 
@@ -193,7 +195,7 @@ function SubmitProperty({ initialReference }) {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <span className="font-bold text-slate-900 text-sm flex items-center gap-2">
                 <Eye className="w-4 h-4 text-amber-500" />
-                Aperçu de votre annonce
+                {t('submit.livePreviewTitle', null, 'Aperçu de votre annonce')}
               </span>
               <button
                 type="button"
@@ -209,7 +211,7 @@ function SubmitProperty({ initialReference }) {
               onClick={() => setShowMobilePreview(false)}
               className="w-full bg-[#0A1931] text-white font-bold py-2.5 rounded-xl text-xs transition"
             >
-              Fermer l'aperçu
+              Fermer
             </button>
           </div>
         </div>

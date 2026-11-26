@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Heart, LogIn, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 /**
  * Toast non bloquant affiché quand un visiteur non connecté tente d'ajouter un bien aux favoris.
@@ -10,6 +11,7 @@ import { Heart, LogIn, X } from 'lucide-react';
  *   autoCloseMs — durée avant fermeture automatique (défaut : 4000 ms)
  */
 export default function LoginPromptToast({ onClose, autoCloseMs = 4000 }) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -36,8 +38,8 @@ export default function LoginPromptToast({ onClose, autoCloseMs = 4000 }) {
       </span>
 
       <div className="flex-1 text-xs sm:text-sm leading-snug overflow-hidden">
-        <p className="font-semibold truncate">Connectez-vous pour sauvegarder</p>
-        <p className="text-slate-300 text-[11px] sm:text-xs mt-0.5 truncate">Synchronisez vos favoris partout.</p>
+        <p className="font-semibold truncate">{t('favorites.loginToastTitle', null, 'Connectez-vous pour sauvegarder')}</p>
+        <p className="text-slate-300 text-[11px] sm:text-xs mt-0.5 truncate">{t('favorites.loginToastText', null, 'Synchronisez vos favoris partout.')}</p>
       </div>
 
       <button
@@ -47,7 +49,7 @@ export default function LoginPromptToast({ onClose, autoCloseMs = 4000 }) {
                    text-slate-950 text-xs font-bold px-2.5 sm:px-3 py-1.5 rounded-lg transition"
       >
         <LogIn className="w-3.5 h-3.5" />
-        <span className="hidden xs:inline">Connexion</span>
+        <span className="hidden xs:inline">{t('favorites.loginToastBtn', null, 'Connexion')}</span>
       </button>
 
       <button
